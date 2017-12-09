@@ -16,7 +16,17 @@ knitr::opts_chunk$set(
 
 ## nls.multstart
 
+Robust and reproducible non-linear regression in R
+
+### Issues and suggestions
+
+Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email d.padfield@exeter.ac.uk.
+
 [![Travis-CI Build Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart)
+
+### Licensing
+
+This package is licensed under GPL-3.
 
 ### Overview
 
@@ -26,6 +36,187 @@ __nls_multstart()__ is the main (currently only) function of __nls.multstart__. 
 
 This package is designed to work with the __tidyverse__, harnessing the functions within __broom__, __tidyr__, __dplyr__ and __purrr__ to extract estimates and plot things easily with __ggplot2__. A slightly less tidy-friendly implementation is [__nlsLoop__](https://github.com/padpadpadpad/nlsLoop).
 
-### Issues and suggestions
+### Installation and examples
 
-Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email d.padfield@exeter.ac.uk.
+#### 1. Installation
+
+R packages in GitHub can be installed using __devtools__.
+
+```{r install, message=FALSE, eval = FALSE}
+# install package
+devtools::install_github("padpadpadpad/nls.multstart")
+
+```
+
+#### 2. Run nls_multstart()
+
+__nls_multstart__ can be used to do non-linear regression on a single curve
+
+```{r run_nlsLoop_prep, message=FALSE, warning=FALSE, results='hide'}
+
+# load in nlsLoop and other packages
+library(nls.multstart)
+library(ggplot2)
+library(broom)
+library(purrr)
+library(dplyr)
+library(tidyr)
+
+# load in example data set
+data("Chlorella_TRC")
+
+# define the Sharpe-Schoolfield equation
+schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
+  Tc <- 273.15 + Tc
+  k <- 8.62e-5
+  boltzmann.term <- lnc + log(exp(E/k*(1/Tc - 1/temp)))
+  inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
+  return(boltzmann.term + inactivation.term)
+  }
+```
+
+```{r run_nls_mulstart}
+ # subset dataset
+d_1 <- subset(Chlorella_TRC, curve_id == 1)
+
+# run nls_multstart
+fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                     data = d_1,
+                     iter = 500,
+                     param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                     supp_errors = 'Y',
+                     AICc = 'Y',
+                     na.action = na.omit,
+                     lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
+
+fit
+```
+
+#### 3. Clean up fit
+
+This fit can then be tidied up in various ways using the R package __broom__. Each different function in __broom__ returns a different set of information. __tidy__ returns the estimated parameters, __augment__ returns the predictions and __glance__ returns information about the model such as AIC score.
+
+```{r look_at_data}
+# get info
+info <- glance(fit)
+
+# get params
+params <- tidy(fit)
+
+# get predictions
+preds <- augment(fit)
+
+info
+params
+preds
+```
+
+#### 4. Plot fit
+
+The predictions can then easily be plotted alongside the actual data.
+
+```{r plot_one_fit, fig.height=6, fig.width=7}
+
+ggplot() +
+  geom_point(aes(K, ln.rate), d_1) +
+  geom_line(aes(K, .fitted), preds)
+
+```
+
+#### 5. Fitting over levels of a factor with nls_multstart
+
+__nls_multstart__ is unlikely to speed you up very much if only one curve is fitted. However, if you have 10, 60 or 100s of curves to fit, it makes sense that at least some of them may not fit with the same starting parameters, no matter how many iterations it is run for. 
+
+This is where __nls_multstart__ can help. Multiple models can be fitted using __purrr__, __dplyr__ and __tidyr__. These fits can then be tidied using __broom__, an approach Hadley Wickham has previously [written about](https://blog.rstudio.com/2016/02/02/tidyr-0-4-0/).
+
+```{r multiple_models}
+# fit over each set of groupings
+fits <- Chlorella_TRC %>%
+  group_by(., flux, growth.temp, process, curve_id) %>%
+  nest() %>%
+  mutate(fit = purrr::map(data, ~ nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                                   data = .x,
+                                   iter = 1000,
+                                   param_bds = c(-10, 10, 0.1, 2, 0.5, 10, 285, 330),
+                                   supp_errors = 'Y',
+                                   AICc = 'Y',
+                                   na.action = na.omit,
+                                   lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))))
+```
+
+A single fit can check to make sure it looks ok.
+
+```{r, check_fit}
+# look at output object
+fits
+
+# look at a single fit
+summary(fits$fit[[1]])
+```
+
+#### 6. Clean up multiple fits
+
+These fits can be cleaned up in a similar way to the single fit, but this time purrr::map() iterates the __broom__ function over the grouping variables.
+
+```{r, tidy_many_fits}
+# get summary
+info <- fits %>%
+  unnest(fit %>% map(glance))
+
+# get params
+params <- fits %>%
+  unnest(fit %>% map(tidy))
+
+# get predictions
+preds <- fits %>%
+  unnest(fit %>% map(augment))
+```
+
+Looking at __info__ allows us to see if all the models converged.
+
+```{r, info}
+info
+```
+
+#### 7. Plotting predictions
+
+When plotting non-linear fits, it often looks better to have a smooth curve, even if there are not many points underlying the fit. This can be achieved by including `newdata` in the __augment__ function and creating a higher resolution set of predictor values. 
+
+However, when predicting for many different fits, it is not certain that each curve has the same range of predictor variables. Consequently, we need to filter each new prediction by the __min__ and __max__ of the predictor variables.
+
+```{r, create_new_preds}
+# new data frame of predictions
+new_preds <- Chlorella_TRC %>%
+  do(., data.frame(K = seq(min(.$K), max(.$K), length.out = 150), stringsAsFactors = FALSE))
+
+# max and min for each curve
+max_min <- group_by(Chlorella_TRC, curve_id) %>%
+  summarise(., min_K = min(K), max_K = max(K)) %>%
+  ungroup()
+
+# create new predictions
+preds2 <- fits %>%
+  unnest(fit %>% map(augment, newdata = new_preds)) %>%
+  merge(., max_min, by = 'curve_id') %>%
+  group_by(., curve_id) %>%
+  filter(., K > unique(min_K) & K < unique(max_K)) %>%
+  rename(., ln.rate = .fitted) %>%
+  ungroup()
+
+```
+
+These can then be plotted using __ggplot2__.
+
+```{r, plot_many_fits, fig.height=7,  fig.width = 7}
+# plot
+ggplot() +
+  geom_point(aes(K - 273.15, ln.rate, col = flux), size = 2, Chlorella_TRC) +
+  geom_line(aes(K - 273.15, ln.rate, col = flux, group = curve_id), alpha = 0.5, preds2) +
+  facet_wrap(~ curve_id, labeller = labeller(.multi_line = F)) +
+  scale_colour_manual(values = c('green4', 'black')) +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  ylab('log Metabolic rate') +
+  xlab('Assay temperature (ºC)') +
+  theme(legend.position = c(0.9, 0.15))
+```
+

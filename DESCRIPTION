@@ -17,4 +17,6 @@ Imports: MuMIn,
     plyr
 Suggests: ggplot2,
     broom,
-    purrr
+    purrr,
+    dplyr,
+    tidyr
