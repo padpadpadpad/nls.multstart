@@ -130,7 +130,7 @@ function(model, data, iter, param_bds, supp_errors = c('Y', 'N'), AICc = c('Y', 
   fit_best <- NULL
 
   for (j in 1:iter){
-    #if((j/10) %% 1 == 0){cat(j, ' ')}
+    # if((j/10) %% 1 == 0){cat(j, ' ')}
     # create start list
     start.vals <- list()
     for(k in 1:length(params_est)){
@@ -152,7 +152,8 @@ function(model, data, iter, param_bds, supp_errors = c('Y', 'N'), AICc = c('Y', 
     # if the AIC score of the next fit model is < the AIC of the stored fit fit, replace the fit
     # the output to ensure the best model is selected
     if(AICc == 'N'){
-      if(is.null(fit) == TRUE){
+
+      if(is.null(fit) && is.null(fit_best)){
         count <-  0
       }
       else{
@@ -164,23 +165,26 @@ function(model, data, iter, param_bds, supp_errors = c('Y', 'N'), AICc = c('Y', 
         stored_AIC <- stats::AIC(fit)
         fit_best <- fit
       }
+
     }
     else{
 
-      if(is.null(fit) == TRUE){
+      if(is.null(fit) && is.null(fit_best)){
         count <-  0
       }
       else{
         count <- ifelse(stored_AIC <= MuMIn::AICc(fit), count + 1, 0)
       }
+
       if(count == 100) break
+
 
       if(!is.null(fit) && stored_AIC == 0 | !is.null(fit) && stored_AIC > MuMIn::AICc(fit)){
 
         stored_AIC <- MuMIn::AICc(fit)
         fit_best <- fit
-
       }
+
     }
   }
 

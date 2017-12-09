@@ -50,7 +50,7 @@ devtools::install_github("padpadpadpad/nls.multstart")
 
 #### 2. Run nls_multstart()
 
-__nls_multstart__ can be used to do non-linear regression on a single curve
+__nls_multstart()__ can be used to do non-linear regression on a single curve
 
 ```{r run_nlsLoop_prep, message=FALSE, warning=FALSE, results='hide'}
 
@@ -94,21 +94,21 @@ fit
 
 #### 3. Clean up fit
 
-This fit can then be tidied up in various ways using the R package __broom__. Each different function in __broom__ returns a different set of information. __tidy__ returns the estimated parameters, __augment__ returns the predictions and __glance__ returns information about the model such as AIC score.
+This fit can then be tidied up in various ways using the R package __broom__. Each different function in __broom__ returns a different set of information. __tidy()__ returns the estimated parameters, __augment()__ returns the predictions and __glance()__ returns information about the model such as AIC score.
 
 ```{r look_at_data}
 # get info
 info <- glance(fit)
+info
 
 # get params
 params <- tidy(fit)
+params
 
 # get predictions
 preds <- augment(fit)
-
-info
-params
 preds
+
 ```
 
 #### 4. Plot fit
@@ -125,9 +125,9 @@ ggplot() +
 
 #### 5. Fitting over levels of a factor with nls_multstart
 
-__nls_multstart__ is unlikely to speed you up very much if only one curve is fitted. However, if you have 10, 60 or 100s of curves to fit, it makes sense that at least some of them may not fit with the same starting parameters, no matter how many iterations it is run for. 
+__nls_multstart()__ is unlikely to speed you up very much if only one curve is fitted. However, if you have 10, 60 or 100s of curves to fit, it makes sense that at least some of them may not fit with the same starting parameters, no matter how many iterations it is run for. 
 
-This is where __nls_multstart__ can help. Multiple models can be fitted using __purrr__, __dplyr__ and __tidyr__. These fits can then be tidied using __broom__, an approach Hadley Wickham has previously [written about](https://blog.rstudio.com/2016/02/02/tidyr-0-4-0/).
+This is where __nls_multstart()__ can help. Multiple models can be fitted using __purrr__, __dplyr__ and __tidyr__. These fits can then be tidied using __broom__, an approach Hadley Wickham has previously [written about](https://blog.rstudio.com/2016/02/02/tidyr-0-4-0/).
 
 ```{r multiple_models}
 # fit over each set of groupings
@@ -137,7 +137,7 @@ fits <- Chlorella_TRC %>%
   mutate(fit = purrr::map(data, ~ nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                                    data = .x,
                                    iter = 1000,
-                                   param_bds = c(-10, 10, 0.1, 2, 0.5, 10, 285, 330),
+                                   param_bds = c(-1000, 1000, 0.1, 2, 0.5, 10, 285, 330),
                                    supp_errors = 'Y',
                                    AICc = 'Y',
                                    na.action = na.omit,
@@ -156,7 +156,7 @@ summary(fits$fit[[1]])
 
 #### 6. Clean up multiple fits
 
-These fits can be cleaned up in a similar way to the single fit, but this time purrr::map() iterates the __broom__ function over the grouping variables.
+These fits can be cleaned up in a similar way to the single fit, but this time __purrr::map()__ iterates the __broom__ function over the grouping variables.
 
 ```{r, tidy_many_fits}
 # get summary
@@ -180,9 +180,9 @@ info
 
 #### 7. Plotting predictions
 
-When plotting non-linear fits, it often looks better to have a smooth curve, even if there are not many points underlying the fit. This can be achieved by including `newdata` in the __augment__ function and creating a higher resolution set of predictor values. 
+When plotting non-linear fits, it often looks better to have a smooth curve, even if there are not many points underlying the fit. This can be achieved by including `newdata` in the __augment()__ function and creating a higher resolution set of predictor values. 
 
-However, when predicting for many different fits, it is not certain that each curve has the same range of predictor variables. Consequently, we need to filter each new prediction by the __min__ and __max__ of the predictor variables.
+However, when predicting for many different fits, it is not certain that each curve has the same range of predictor variables. Consequently, we need to filter each new prediction by the __min()__ and __max()__ of the predictor variables.
 
 ```{r, create_new_preds}
 # new data frame of predictions
@@ -212,7 +212,7 @@ These can then be plotted using __ggplot2__.
 ggplot() +
   geom_point(aes(K - 273.15, ln.rate, col = flux), size = 2, Chlorella_TRC) +
   geom_line(aes(K - 273.15, ln.rate, col = flux, group = curve_id), alpha = 0.5, preds2) +
-  facet_wrap(~ curve_id, labeller = labeller(.multi_line = F)) +
+  facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = FALSE)) +
   scale_colour_manual(values = c('green4', 'black')) +
   theme_bw(base_size = 12, base_family = 'Helvetica') +
   ylab('log Metabolic rate') +
