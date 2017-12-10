@@ -19,4 +19,5 @@ Suggests: ggplot2,
     broom,
     purrr,
     dplyr,
-    tidyr
+    tidyr,
+    nlstools

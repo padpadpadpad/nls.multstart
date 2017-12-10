@@ -16,7 +16,7 @@ This package is licensed under GPL-3.
 
 ### Overview
 
-**nls.multstart** is an R package that allows more robust and reproducible non-linear regression compared to **nls** or **nlsLM**. These functions allow only a single starting value, meaning that it can be hard to get the best estimated model. This is especially true if the same model is fitted over the levels of a factor, which may have the same shape of curve, but be much different in terms of parameter estimates.
+**nls.multstart** is an R package that allows more robust and reproducible non-linear regression compared to **nls()** or **nlsLM()**. These functions allow only a single starting value, meaning that it can be hard to get the best estimated model. This is especially true if the same model is fitted over the levels of a factor, which may have the same shape of curve, but be much different in terms of parameter estimates.
 
 **nls\_multstart()** is the main (currently only) function of **nls.multstart**. Similar to the R package **nls2**, it allows multiple starting values for each parameter and then iterates through multiple starting values, attempting a fit with each set of start parameters. The best model is then picked on AIC score. This results in a more reproducible and reliable method of fitting non-linear least squares regression in R.
 
@@ -46,6 +46,7 @@ library(broom)
 library(purrr)
 library(dplyr)
 library(tidyr)
+library(nlstools)
 
 # load in example data set
 data("Chlorella_TRC")
@@ -61,7 +62,7 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
 ```
 
 ``` r
- # subset dataset
+# subset dataset
 d_1 <- subset(Chlorella_TRC, curve_id == 1)
 
 # run nls_multstart
@@ -82,13 +83,13 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 30 
+#> Number of iterations to convergence: 18 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
 #### 3. Clean up fit
 
-This fit can then be tidied up in various ways using the R package **broom**. Each different function in **broom** returns a different set of information. **tidy()** returns the estimated parameters, **augment()** returns the predictions and **glance()** returns information about the model such as AIC score.
+This fit can then be tidied up in various ways using the R package **broom**. Each different function in **broom** returns a different set of information. **tidy()** returns the estimated parameters, **augment()** returns the predictions and **glance()** returns information about the model such as AIC score. Confidence intervals of non-linear regression can also be estimated using **nlstools::confint2()**
 
 ``` r
 # get info
@@ -101,12 +102,20 @@ info
 
 # get params
 params <- tidy(fit)
-params
-#>   term    estimate std.error statistic      p.value
-#> 1  lnc  -1.3462105 0.4656398 -2.891098 2.016515e-02
-#> 2    E   0.9877307 0.4521481  2.184529 6.043425e-02
-#> 3   Eh   4.3326452 1.4877827  2.912149 1.952469e-02
-#> 4   Th 312.1887459 3.8781636 80.499116 6.323538e-13
+
+# get confidence intervals using nlstools
+CI <- confint2(fit) %>%
+  data.frame() %>%
+  rename(., conf.low = X2.5.., conf.high = X97.5..)
+
+# bind params and confidence intervals
+params <- bind_cols(params, CI)
+select(params, -c(statistic, p.value))
+#>   term    estimate std.error     conf.low   conf.high
+#> 1  lnc  -1.3462105 0.4656398  -2.41997789  -0.2724432
+#> 2    E   0.9877307 0.4521481  -0.05492466   2.0303860
+#> 3   Eh   4.3326452 1.4877826   0.90181231   7.7634782
+#> 4   Th 312.1887459 3.8781636 303.24568449 321.1318073
 
 # get predictions
 preds <- augment(fit)
@@ -115,15 +124,15 @@ preds
 #> 1  -2.06257833 289.15 -1.88694035 -0.17563798
 #> 2  -1.32437939 292.15 -1.48002017  0.15564078
 #> 3  -0.95416807 295.15 -1.08143502  0.12726694
-#> 4  -0.79443675 298.15 -0.69121465 -0.10322209
+#> 4  -0.79443675 298.15 -0.69121466 -0.10322209
 #> 5  -0.18203642 301.15 -0.31058073  0.12854430
 #> 6   0.17424007 304.15  0.05336433  0.12087574
-#> 7  -0.04462754 307.15  0.36657463 -0.41120216
+#> 7  -0.04462754 307.15  0.36657462 -0.41120216
 #> 8   0.48050690 310.15  0.49837148 -0.01786458
 #> 9   0.38794188 313.15  0.17973800  0.20820389
-#> 10  0.39365516 316.15 -0.64473314  1.03838830
+#> 10  0.39365516 316.15 -0.64473314  1.03838829
 #> 11 -3.86319577 319.15 -1.70300698 -2.16018879
-#> 12 -1.72352435 322.15 -2.81272004  1.08919568
+#> 12 -1.72352435 322.15 -2.81272003  1.08919568
 ```
 
 #### 4. Plot fit
@@ -160,25 +169,25 @@ fits <- Chlorella_TRC %>%
                                    lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))))
 ```
 
-A single fit can check to make sure it looks ok.
+A single fit can check to make sure it looks ok. Looking at `fits` demonstrates that there is now a `fit` list column containing each of the non-linear fits for each combination of our grouping variables.
 
 ``` r
 # look at output object
-fits
-#> # A tibble: 60 x 6
-#>           flux growth.temp     process curve_id              data
-#>          <chr>       <dbl>       <chr>    <dbl>            <list>
-#>  1 respiration          20 acclimation        1 <tibble [12 x 3]>
-#>  2 respiration          20 acclimation        2 <tibble [12 x 3]>
-#>  3 respiration          23 acclimation        3 <tibble [12 x 3]>
-#>  4 respiration          27 acclimation        4  <tibble [9 x 3]>
-#>  5 respiration          27 acclimation        5 <tibble [12 x 3]>
-#>  6 respiration          30 acclimation        6 <tibble [12 x 3]>
-#>  7 respiration          30 acclimation        7 <tibble [12 x 3]>
-#>  8 respiration          33 acclimation        8 <tibble [10 x 3]>
-#>  9 respiration          33 acclimation        9  <tibble [8 x 3]>
-#> 10 respiration          20 acclimation       10 <tibble [10 x 3]>
-#> # ... with 50 more rows, and 1 more variables: fit <list>
+select(fits, curve_id, data, fit)
+#> # A tibble: 60 x 3
+#>    curve_id              data       fit
+#>       <dbl>            <list>    <list>
+#>  1        1 <tibble [12 x 3]> <S3: nls>
+#>  2        2 <tibble [12 x 3]> <S3: nls>
+#>  3        3 <tibble [12 x 3]> <S3: nls>
+#>  4        4  <tibble [9 x 3]> <S3: nls>
+#>  5        5 <tibble [12 x 3]> <S3: nls>
+#>  6        6 <tibble [12 x 3]> <S3: nls>
+#>  7        7 <tibble [12 x 3]> <S3: nls>
+#>  8        8 <tibble [10 x 3]> <S3: nls>
+#>  9        9  <tibble [8 x 3]> <S3: nls>
+#> 10       10 <tibble [10 x 3]> <S3: nls>
+#> # ... with 50 more rows
 
 # look at a single fit
 summary(fits$fit[[1]])
@@ -196,7 +205,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 18 
+#> Number of iterations to convergence: 14 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -213,6 +222,18 @@ info <- fits %>%
 params <- fits %>%
   unnest(fit %>% map(tidy))
 
+# get confidence intervals
+CI <- fits %>% 
+  unnest(fit %>% map(~ confint2(.x) %>%
+  data.frame() %>%
+  rename(., conf.low = X2.5.., conf.high = X97.5..))) %>%
+  group_by(., curve_id) %>%
+  mutate(., term = c('lnc', 'E', 'Eh', 'Th')) %>%
+  ungroup()
+
+# merge parameters and CI estimates
+params <- merge(params, CI, by = intersect(names(params), names(CI)))
+
 # get predictions
 preds <- fits %>%
   unnest(fit %>% map(augment))
@@ -221,23 +242,21 @@ preds <- fits %>%
 Looking at **info** allows us to see if all the models converged.
 
 ``` r
-info
-#> # A tibble: 60 x 14
-#>           flux growth.temp     process curve_id              data
-#>          <chr>       <dbl>       <chr>    <dbl>            <list>
-#>  1 respiration          20 acclimation        1 <tibble [12 x 3]>
-#>  2 respiration          20 acclimation        2 <tibble [12 x 3]>
-#>  3 respiration          23 acclimation        3 <tibble [12 x 3]>
-#>  4 respiration          27 acclimation        4  <tibble [9 x 3]>
-#>  5 respiration          27 acclimation        5 <tibble [12 x 3]>
-#>  6 respiration          30 acclimation        6 <tibble [12 x 3]>
-#>  7 respiration          30 acclimation        7 <tibble [12 x 3]>
-#>  8 respiration          33 acclimation        8 <tibble [10 x 3]>
-#>  9 respiration          33 acclimation        9  <tibble [8 x 3]>
-#> 10 respiration          20 acclimation       10 <tibble [10 x 3]>
-#> # ... with 50 more rows, and 9 more variables: fit <list>, sigma <dbl>,
-#> #   isConv <lgl>, finTol <dbl>, logLik <dbl>, AIC <dbl>, BIC <dbl>,
-#> #   deviance <dbl>, df.residual <int>
+select(info, curve_id, logLik, AIC, BIC, deviance, df.residual)
+#> # A tibble: 60 x 6
+#>    curve_id      logLik       AIC       BIC  deviance df.residual
+#>       <dbl>       <dbl>     <dbl>     <dbl>     <dbl>       <int>
+#>  1        1 -14.0094789 38.018958 40.443491 7.2568273           8
+#>  2        2  -1.1969914 12.393983 14.818516 0.8577249           8
+#>  3        3  -7.3855699 24.771140 27.195673 2.4059814           8
+#>  4        4  -0.5234387 11.046877 12.033000 0.5919502           5
+#>  5        5 -10.8498521 31.699704 34.124237 4.2859330           8
+#>  6        6  -8.5177734 27.035547 29.460080 2.9056540           8
+#>  7        7  -1.2867882 12.573576 14.998110 0.8706583           8
+#>  8        8 -13.3622709 36.724542 38.237467 8.4753522           6
+#>  9        9   1.8203869  6.359226  6.756434 0.2971458           4
+#> 10       10  -1.2689999 12.538000 14.050925 0.7546570           6
+#> # ... with 50 more rows
 ```
 
 #### 7. Plotting predictions
@@ -282,3 +301,23 @@ ggplot() +
 ```
 
 ![](README-plot_many_fits-1.png)
+
+#### 8. Plotting confidence intervals
+
+The confidence intervals of each parameter for each curve fit can also be easily visualised.
+
+``` r
+# plot
+ggplot(params, aes(col = flux)) +
+  geom_point(aes(curve_id, estimate)) +
+  facet_wrap(~ term, scale = 'free_x', ncol = 4) +
+  geom_linerange(aes(curve_id, ymin = conf.low, ymax = conf.high)) +
+  coord_flip() +
+  scale_color_manual(values = c('green4', 'black')) +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme(legend.position = 'top') +
+  xlab('curve') +
+  ylab('parameter estimate')
+```
+
+![](README-confint_plot-1.png)

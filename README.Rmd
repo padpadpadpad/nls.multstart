@@ -30,7 +30,7 @@ This package is licensed under GPL-3.
 
 ### Overview
 
-__nls.multstart__ is an R package that allows more robust and reproducible non-linear regression compared to __nls__ or __nlsLM__. These functions allow only a single starting value, meaning that it can be hard to get the best estimated model. This is especially true if the same model is fitted over the levels of a factor, which may have the same shape of curve, but be much different in terms of parameter estimates.
+__nls.multstart__ is an R package that allows more robust and reproducible non-linear regression compared to __nls()__ or __nlsLM()__. These functions allow only a single starting value, meaning that it can be hard to get the best estimated model. This is especially true if the same model is fitted over the levels of a factor, which may have the same shape of curve, but be much different in terms of parameter estimates.
 
 __nls_multstart()__ is the main (currently only) function of __nls.multstart__. Similar to the R package __nls2__, it allows multiple starting values for each parameter and then iterates through multiple starting values, attempting a  fit with each set of start parameters. The best model is then picked on AIC score. This results in a more reproducible and reliable method of fitting non-linear least squares regression in R.
 
@@ -61,6 +61,7 @@ library(broom)
 library(purrr)
 library(dplyr)
 library(tidyr)
+library(nlstools)
 
 # load in example data set
 data("Chlorella_TRC")
@@ -76,7 +77,7 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
 ```
 
 ```{r run_nls_mulstart}
- # subset dataset
+# subset dataset
 d_1 <- subset(Chlorella_TRC, curve_id == 1)
 
 # run nls_multstart
@@ -94,7 +95,7 @@ fit
 
 #### 3. Clean up fit
 
-This fit can then be tidied up in various ways using the R package __broom__. Each different function in __broom__ returns a different set of information. __tidy()__ returns the estimated parameters, __augment()__ returns the predictions and __glance()__ returns information about the model such as AIC score.
+This fit can then be tidied up in various ways using the R package __broom__. Each different function in __broom__ returns a different set of information. __tidy()__ returns the estimated parameters, __augment()__ returns the predictions and __glance()__ returns information about the model such as AIC score. Confidence intervals of non-linear regression can also be estimated using __nlstools::confint2()__
 
 ```{r look_at_data}
 # get info
@@ -103,7 +104,15 @@ info
 
 # get params
 params <- tidy(fit)
-params
+
+# get confidence intervals using nlstools
+CI <- confint2(fit) %>%
+  data.frame() %>%
+  rename(., conf.low = X2.5.., conf.high = X97.5..)
+
+# bind params and confidence intervals
+params <- bind_cols(params, CI)
+select(params, -c(statistic, p.value))
 
 # get predictions
 preds <- augment(fit)
@@ -144,11 +153,11 @@ fits <- Chlorella_TRC %>%
                                    lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))))
 ```
 
-A single fit can check to make sure it looks ok.
+A single fit can check to make sure it looks ok. Looking at `fits` demonstrates that there is now a `fit` list column containing each of the non-linear fits for each combination of our grouping variables.
 
 ```{r, check_fit}
 # look at output object
-fits
+select(fits, curve_id, data, fit)
 
 # look at a single fit
 summary(fits$fit[[1]])
@@ -167,6 +176,18 @@ info <- fits %>%
 params <- fits %>%
   unnest(fit %>% map(tidy))
 
+# get confidence intervals
+CI <- fits %>% 
+  unnest(fit %>% map(~ confint2(.x) %>%
+  data.frame() %>%
+  rename(., conf.low = X2.5.., conf.high = X97.5..))) %>%
+  group_by(., curve_id) %>%
+  mutate(., term = c('lnc', 'E', 'Eh', 'Th')) %>%
+  ungroup()
+
+# merge parameters and CI estimates
+params <- merge(params, CI, by = intersect(names(params), names(CI)))
+
 # get predictions
 preds <- fits %>%
   unnest(fit %>% map(augment))
@@ -175,7 +196,7 @@ preds <- fits %>%
 Looking at __info__ allows us to see if all the models converged.
 
 ```{r, info}
-info
+select(info, curve_id, logLik, AIC, BIC, deviance, df.residual)
 ```
 
 #### 7. Plotting predictions
@@ -220,3 +241,20 @@ ggplot() +
   theme(legend.position = c(0.9, 0.15))
 ```
 
+#### 8. Plotting confidence intervals
+
+The confidence intervals of each parameter for each curve fit can also be easily visualised.
+
+```{r, confint_plot, fig.width = 7, fig.height = 8}
+# plot
+ggplot(params, aes(col = flux)) +
+  geom_point(aes(curve_id, estimate)) +
+  facet_wrap(~ term, scale = 'free_x', ncol = 4) +
+  geom_linerange(aes(curve_id, ymin = conf.low, ymax = conf.high)) +
+  coord_flip() +
+  scale_color_manual(values = c('green4', 'black')) +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme(legend.position = 'top') +
+  xlab('curve') +
+  ylab('parameter estimate')
+```
