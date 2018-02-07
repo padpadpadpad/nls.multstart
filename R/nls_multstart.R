@@ -2,8 +2,8 @@
 #'
 #' Finds the best estimated model using non-linear least squares regression using nlsLM(). The best fit is determined using AIC scores.
 #'
-#' @param data a data
-#' @param model a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right
+#' @param formula a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right
+#' @param data data.frame (optional) in which to evaluate the variables in \code{formula} and \code{weights}
 #' @param iter number of combinations of starting parameters that
 #' are tried on each curve.
 #' @param param_bds lower and upper boundaries for the start parameters. If
@@ -55,7 +55,7 @@
 
 nls_multstart <-
   # arguments needed for nlsLoop ####
-function(model, data, iter, param_bds, supp_errors = c('Y', 'N'), AICc = c('Y', 'N'), control, ...){
+function(formula, data = parent.frame(), iter, param_bds, supp_errors = c('Y', 'N'), AICc = c('Y', 'N'), control, ...){
 
   # set default values
   if(missing(supp_errors)){supp_errors <- 'N'}
@@ -68,11 +68,18 @@ function(model, data, iter, param_bds, supp_errors = c('Y', 'N'), AICc = c('Y', 
   }
 
   # create model ####
-  formula <- stats::as.formula(model)
+  formula <- stats::as.formula(formula)
 
   # define parameters to estimate and independent variable ####
-  params_ind <- all.vars(formula[[3]])[all.vars(formula[[3]]) %in% colnames(data)]
-  params_est <- all.vars(formula[[3]])[! all.vars(formula[[3]]) %in% colnames(data)]
+  if(is.data.frame(data)) {
+    params_ind <- all.vars(formula[[3]])[all.vars(formula[[3]]) %in% colnames(data)]
+    params_est <- all.vars(formula[[3]])[! all.vars(formula[[3]]) %in% colnames(data)]
+  } else if(is.environment(data)) {
+    params_ind <- all.vars(formula[[3]])[all.vars(formula[[3]]) %in% names(data)]
+    params_est <- all.vars(formula[[3]])[! all.vars(formula[[3]]) %in% names(data)]
+  } else {
+    stop("data should be a data.frame or an environment")
+  }
 
   # set up parameter boundaries ####
   params_bds <- data.frame(param = params_est, stringsAsFactors = FALSE)
