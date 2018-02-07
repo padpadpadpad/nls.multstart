@@ -4,13 +4,13 @@
 \alias{nls_multstart}
 \title{Finds the best fit of non-linear model based on AIC score}
 \usage{
-nls_multstart(model, data, iter, param_bds, supp_errors = c("Y", "N"),
-  AICc = c("Y", "N"), control, ...)
+nls_multstart(formula, data = parent.frame(), iter, param_bds,
+  supp_errors = c("Y", "N"), AICc = c("Y", "N"), control, ...)
 }
 \arguments{
-\item{model}{a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right}
+\item{formula}{a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right}
 
-\item{data}{a data}
+\item{data}{data.frame (optional) in which to evaluate the variables in \code{formula} and \code{weights}}
 
 \item{iter}{number of combinations of starting parameters that
 are tried on each curve.}
