@@ -4,8 +4,12 @@
 #'
 #' @param formula a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right
 #' @param data data.frame (optional) in which to evaluate the variables in \code{formula} and \code{weights}
-#' @param iter number of combinations of starting parameters that
-#' are tried on each curve.
+#' @param iter number of combinations of starting parameters which will be tried
+#' are tried. If a single value is provided, then a shotgun/random-search approach will be used to sample
+#' starting parameters from a uniform distribution within the starting parameter bounds. If a vector of the same length as the number of
+#' parameters is provided, then a gridstart approach will be used to define each combination of that number of equally spaced intervals across each of the
+#' starting parameter bounds respectively. Thus, c(5,5,5) for three fitted parameters yields 125 model fits.  Specifying that a gridstart approach should be
+#' used will override a \code{convergence_count}.
 #' @param param_bds lower and upper boundaries for the start parameters. If
 #' missing these default to +/- 1e+09. Need to specified as a vector as :
 #' c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
@@ -13,10 +17,10 @@
 #' @param supp_errors if \code{supp_errors = 'Y'}, then no error messages will be shown
 #' from the nlsLM function, reducing the number of error messages
 #' printed while the model attempts to converge using poor starting parameters. Advised to only use \code{supp_errors = 'Y'} when you are confident in the bounds of your starting parameters.
-#' @param AICc whether or not the small sample AIC should be used. Defaults to
-#' \code{'Y'}. Override this using \code{AICc == 'N'}. AICc should be used instead of AIC
-#' when sample size is small in comparison to the number of estimated
-#' parameters (Burnham & Anderson 2002 recommend its use when n / n_param < 40).
+#' @param convergence_count The number of counts that the winning model should be undefeated for before it is declared the winner. This
+#' argument defaults to 100. If specified as FALSE, then all of the iterations will be fitted, and the best model selected. Note that
+#' \code{converge_count} can only be used with a shotgun/random-search approach, and not with a gridstart approach. This argument will
+#' be ignored if a gridstart approach is specified by a vector input for \code{iter}.
 #' @param control specific control can be specified using \code{\link[minpack.lm]{nls.lm.control}}.
 #' @param \dots Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.
 #' @return returns a nls object of the best estimated model fit
@@ -25,15 +29,13 @@
 #' @author Daniel Padfield
 #' @seealso
 #' \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
-#'
-#' \code{\link[MuMIn]{AICc}} for application of AICc.
 #' @examples
 #' # load in data
 #'
 #' data("Chlorella_TRC")
 #' Chlorella_TRC_test <- Chlorella_TRC[Chlorella_TRC$curve_id == 1,]
 #'
-#' # run nlsLoop()
+#' # run nls_multstart()
 #'
 #'# define the Sharpe-Schoolfield equation
 #' schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
@@ -54,18 +56,12 @@
 #' @export
 
 nls_multstart <-
-  # arguments needed for nlsLoop ####
-function(formula, data = parent.frame(), iter, param_bds, supp_errors = c('Y', 'N'), AICc = c('Y', 'N'), control, ...){
+  # arguments needed for nls_multstart ####
+function(formula, data = parent.frame(), iter, param_bds, supp_errors = c('Y', 'N'),
+         convergence_count = 100, control, ...){
 
   # set default values
   if(missing(supp_errors)){supp_errors <- 'N'}
-  if(missing(AICc)){AICc <- 'Y'}
-
-  # checking whether MuMIn is installed
-  if (!requireNamespace("MuMIn", quietly = TRUE)){
-    stop("The MuMIn package is needed for calculation of AICc. Please install. Can be bypassed by using classic AIC using AICc = 'N'",
-         call. = FALSE)
-  }
 
   # create model ####
   formula <- stats::as.formula(formula)
@@ -115,50 +111,81 @@ function(formula, data = parent.frame(), iter, param_bds, supp_errors = c('Y', '
   }
 
 
-  # set up start values ####
-  make_strt_values <- function(x, iter){
-    strt_values <- data.frame(param = rep(x, times = iter),
-                              value = stats::runif(iter, min = params_bds$low.bds[params_bds$param == x], max = params_bds$high.bds[params_bds$param == x]), stringsAsFactors = FALSE)
-    return(strt_values)
+  # transform input arguments
+  silent <- ifelse( supp_errors=='Y', TRUE, FALSE )
+
+  if( length(iter) == 1 ) {
+    multistart_type = 'shotgun'
+  } else if( length(iter) == nrow(params_bds) ) {
+    multistart_type = 'gridstart'
+  } else {
+    stop('iter should be of length 1 for shotgun approach and of the same length as the
+         number of parameters for the gridstart approach.')
   }
 
-  strt <- plyr::ldply(as.list(params_est), make_strt_values, iter)
+  if(multistart_type == 'gridstart' && convergence_count != FALSE) {
+    warning('A gridstart approach cannot be applied with convergence_count. Convergence count will be set to FALSE')
+    convergence_count <- FALSE
+  }
 
-  # fit nls model using LM optimisation and using shotgun approach to get starting values ####
 
-  # set count to 0
-  count <- 0
+  # set up start values ####
 
-  # create AIC vector
-  stored_AIC <- 0
+  ## SHOTGUN ##
 
-  # create empty fit
-  fit <- NULL
-  fit_best <- NULL
+  if( multistart_type == 'shotgun' ) {
 
-  for (j in 1:iter){
-    # if((j/10) %% 1 == 0){cat(j, ' ')}
-    # create start list
-    start.vals <- list()
-    for(k in 1:length(params_est)){
-      start.vals[[params_est[k]]] <- strt[strt$param == params_est[k],]$value[j]
-    }
-    # try and fit the model for every set of searching parameters
-    if(supp_errors == 'Y'){
+    strt <- purrr::map2(params_bds$low.bds, params_bds$high.bds, ~runif(iter, .x, .y))
+    names(strt) <- params_bds$param
+    strt <- dplyr::bind_rows(strt)
+
+  }
+
+
+  ## GRIDSTART ##
+
+  if( multistart_type == 'gridstart' ) {
+
+    params_bds$iter <- iter
+    strt <- purrr::pmap(as.list(params_bds[,-1]),
+                        function(low.bds, high.bds, iter) seq(from=low.bds, to=high.bds, length.out=iter))
+    names(strt) <- params_bds$param
+    strt <- tibble::as_tibble(expand.grid(strt))
+
+  }
+
+
+  # Fit nls model using LM optimisation across multiple starting values
+
+
+  #### Shotgun approach with convergence ####
+
+  if(multistart_type=='shotgun' && convergence_count != FALSE) {
+
+    # set count to 0
+    count <- 0
+
+    # create AIC vector
+    stored_AIC <- Inf
+
+    # create empty fit
+    fit <- NULL
+    fit_best <- NULL
+
+    for (j in 1:nrow(strt)) {
+
+      start.vals <- as.list(strt[j,])
+
+      # try and fit the model for every set of searching parameters
       try(fit <- minpack.lm::nlsLM(formula,
-                                   start=start.vals,
-                                   control = control,
-                                   data = data, ...),
-          silent = TRUE)}
-    if(supp_errors != 'Y'){
-      try(fit <- minpack.lm::nlsLM(formula,
-                                   start=start.vals,
-                                   control = control,
-                                   data = data, ...))}
+                                     start=start.vals,
+                                     control = control,
+                                     data = data, ...),
+                                silent = silent)
 
-    # if the AIC score of the next fit model is < the AIC of the stored fit fit, replace the fit
-    # the output to ensure the best model is selected
-    if(AICc == 'N'){
+
+      # if the AIC score of the next fit model is < the AIC of the stored fit fit, replace the fit
+      # the output to ensure the best model is selected
 
       if(is.null(fit) && is.null(fit_best)){
         count <-  0
@@ -166,34 +193,57 @@ function(formula, data = parent.frame(), iter, param_bds, supp_errors = c('Y', '
       else{
         count <- ifelse(stored_AIC <= stats::AIC(fit), count + 1, 0)
       }
-      if(count == 100) break
+      if(count == convergence_count) break
 
-      if(!is.null(fit) && stored_AIC == 0 | !is.null(fit) && stored_AIC > stats::AIC(fit)){
+      if(!is.null(fit) && stored_AIC > stats::AIC(fit)){
         stored_AIC <- stats::AIC(fit)
         fit_best <- fit
       }
-
-    }
-    else{
-
-      if(is.null(fit) && is.null(fit_best)){
-        count <-  0
-      }
-      else{
-        count <- ifelse(stored_AIC <= MuMIn::AICc(fit), count + 1, 0)
-      }
-
-      if(count == 100) break
-
-
-      if(!is.null(fit) && stored_AIC == 0 | !is.null(fit) && stored_AIC > MuMIn::AICc(fit)){
-
-        stored_AIC <- MuMIn::AICc(fit)
-        fit_best <- fit
-      }
-
     }
   }
+
+
+  #### Without convergence_count ####
+
+  if(convergence_count == FALSE) {
+
+    strt$iteration = 1:nrow(strt)
+
+    allfits <- tidyr::nest(strt, -iteration, .key="startpars")
+
+
+    # create empty fit
+    fit <- NULL
+    fit_best <- NULL
+
+
+    # fit_function saves only AIC values so as not to fill memory with model fits
+
+    fit_aic <- function(startpars) {
+
+      start.vals <- as.list(startpars[[1]])
+
+      try(fit <- minpack.lm::nlsLM(formula,
+                                   start=start.vals,
+                                   control = control,
+                                   data = data, ...),
+                              silent = silent)
+      AICval <- ifelse( !is.null(fit), AIC(fit), Inf )
+
+      return(AICval)
+    }
+
+    allfits <- dplyr::group_by(allfits, iteration)
+    allfits <- dplyr::mutate(allfits, AICval = purrr::map_dbl(startpars,
+                                                           ~fit_aic(startpars)) )
+    allfits <- dplyr::arrange(allfits, AICval)
+
+    fit_best <- minpack.lm::nlsLM(formula,
+                                         start=allfits$startpars[[1]],
+                                         control = control,
+                                         data = data, ...)
+
+    }
 
   return(fit_best)
 
