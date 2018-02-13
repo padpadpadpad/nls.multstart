@@ -5,15 +5,19 @@
 \title{Finds the best fit of non-linear model based on AIC score}
 \usage{
 nls_multstart(formula, data = parent.frame(), iter, param_bds,
-  supp_errors = c("Y", "N"), AICc = c("Y", "N"), control, ...)
+  supp_errors = c("Y", "N"), convergence_count = 100, control, ...)
 }
 \arguments{
 \item{formula}{a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right}
 
 \item{data}{data.frame (optional) in which to evaluate the variables in \code{formula} and \code{weights}}
 
-\item{iter}{number of combinations of starting parameters that
-are tried on each curve.}
+\item{iter}{number of combinations of starting parameters which will be tried
+are tried. If a single value is provided, then a shotgun/random-search approach will be used to sample
+starting parameters from a uniform distribution within the starting parameter bounds. If a vector of the same length as the number of
+parameters is provided, then a gridstart approach will be used to define each combination of that number of equally spaced intervals across each of the
+starting parameter bounds respectively. Thus, c(5,5,5) for three fitted parameters yields 125 model fits.  Specifying that a gridstart approach should be
+used will override a \code{convergence_count}.}
 
 \item{param_bds}{lower and upper boundaries for the start parameters. If
 missing these default to +/- 1e+09. Need to specified as a vector as :
@@ -24,10 +28,10 @@ param 2 etc)}
 from the nlsLM function, reducing the number of error messages
 printed while the model attempts to converge using poor starting parameters. Advised to only use \code{supp_errors = 'Y'} when you are confident in the bounds of your starting parameters.}
 
-\item{AICc}{whether or not the small sample AIC should be used. Defaults to
-\code{'Y'}. Override this using \code{AICc == 'N'}. AICc should be used instead of AIC
-when sample size is small in comparison to the number of estimated
-parameters (Burnham & Anderson 2002 recommend its use when n / n_param < 40).}
+\item{convergence_count}{The number of counts that the winning model should be undefeated for before it is declared the winner. This
+argument defaults to 100. If specified as FALSE, then all of the iterations will be fitted, and the best model selected. Note that
+\code{converge_count} can only be used with a shotgun/random-search approach, and not with a gridstart approach. This argument will
+be ignored if a gridstart approach is specified by a vector input for \code{iter}.}
 
 \item{control}{specific control can be specified using \code{\link[minpack.lm]{nls.lm.control}}.}
 
@@ -49,7 +53,7 @@ Useful additional arguments for \code{\link[minpack.lm]{nlsLM}} include: \code{n
 data("Chlorella_TRC")
 Chlorella_TRC_test <- Chlorella_TRC[Chlorella_TRC$curve_id == 1,]
 
-# run nlsLoop()
+# run nls_multstart()
 
 # define the Sharpe-Schoolfield equation
 schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
@@ -70,8 +74,6 @@ fits <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 
 }
 \seealso{
 \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
-
-\code{\link[MuMIn]{AICc}} for application of AICc.
 }
 \author{
 Daniel Padfield
