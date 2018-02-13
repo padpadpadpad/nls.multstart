@@ -1,8 +1,10 @@
 Package: nls.multstart
 Type: Package
 Title: Robust Non-Linear regression using AIC scores
-Version: 0.1.0
-Author: Daniel Padfield
+Version: 0.1.1
+Authors@R: c(
+    person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = "cre"),
+    person("Granville", "Matheson", email = "mathesong@gmail.com", role = "aut"))
 Maintainer: Daniel Padfield <d.padfield@exeter.ac.uk>
 Description: Robust non-linear regression using multiple starting points
 License: GPL-3

@@ -18,6 +18,12 @@ knitr::opts_chunk$set(
 
 Robust and reproducible non-linear regression in R
 
+### Authors and maintainers
+
+Daniel Padfield: d.padfield@exeter.ac.uk
+
+Granville Matheson: mathesong@gmail.com
+
 ### Issues and suggestions
 
 Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email d.padfield@exeter.ac.uk.
@@ -86,7 +92,6 @@ fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 2
                      iter = 500,
                      param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
                      supp_errors = 'Y',
-                     AICc = 'Y',
                      na.action = na.omit,
                      lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
 
@@ -148,7 +153,6 @@ fits <- Chlorella_TRC %>%
                                    iter = 1000,
                                    param_bds = c(-1000, 1000, 0.1, 2, 0.5, 10, 285, 330),
                                    supp_errors = 'Y',
-                                   AICc = 'Y',
                                    na.action = na.omit,
                                    lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))))
 ```

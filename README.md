@@ -4,6 +4,12 @@ nls.multstart
 
 Robust and reproducible non-linear regression in R
 
+### Authors and maintainers
+
+Daniel Padfield: <d.padfield@exeter.ac.uk>
+
+Granville Matheson: <mathesong@gmail.com>
+
 ### Issues and suggestions
 
 Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email <d.padfield@exeter.ac.uk>.
@@ -71,7 +77,6 @@ fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 2
                      iter = 500,
                      param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
                      supp_errors = 'Y',
-                     AICc = 'Y',
                      na.action = na.omit,
                      lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
 
@@ -83,7 +88,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 18 
+#> Number of iterations to convergence: 12 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -112,27 +117,27 @@ CI <- confint2(fit) %>%
 params <- bind_cols(params, CI)
 select(params, -c(statistic, p.value))
 #>   term    estimate std.error     conf.low   conf.high
-#> 1  lnc  -1.3462105 0.4656398  -2.41997789  -0.2724432
-#> 2    E   0.9877307 0.4521481  -0.05492466   2.0303860
-#> 3   Eh   4.3326452 1.4877826   0.90181231   7.7634782
-#> 4   Th 312.1887459 3.8781636 303.24568449 321.1318073
+#> 1  lnc  -1.3462105 0.4656398  -2.41997788  -0.2724432
+#> 2    E   0.9877306 0.4521481  -0.05492466   2.0303859
+#> 3   Eh   4.3326453 1.4877827   0.90181225   7.7634783
+#> 4   Th 312.1887460 3.8781636 303.24568469 321.1318074
 
 # get predictions
 preds <- augment(fit)
 preds
 #>        ln.rate      K     .fitted      .resid
-#> 1  -2.06257833 289.15 -1.88694035 -0.17563798
-#> 2  -1.32437939 292.15 -1.48002017  0.15564078
-#> 3  -0.95416807 295.15 -1.08143502  0.12726694
-#> 4  -0.79443675 298.15 -0.69121466 -0.10322209
-#> 5  -0.18203642 301.15 -0.31058073  0.12854430
-#> 6   0.17424007 304.15  0.05336433  0.12087574
-#> 7  -0.04462754 307.15  0.36657462 -0.41120216
-#> 8   0.48050690 310.15  0.49837148 -0.01786458
-#> 9   0.38794188 313.15  0.17973800  0.20820389
-#> 10  0.39365516 316.15 -0.64473314  1.03838829
-#> 11 -3.86319577 319.15 -1.70300698 -2.16018879
-#> 12 -1.72352435 322.15 -2.81272003  1.08919568
+#> 1  -2.06257833 289.15 -1.88694033 -0.17563800
+#> 2  -1.32437939 292.15 -1.48002015  0.15564076
+#> 3  -0.95416807 295.15 -1.08143501  0.12726694
+#> 4  -0.79443675 298.15 -0.69121465 -0.10322210
+#> 5  -0.18203642 301.15 -0.31058073  0.12854431
+#> 6   0.17424007 304.15  0.05336432  0.12087575
+#> 7  -0.04462754 307.15  0.36657462 -0.41120215
+#> 8   0.48050690 310.15  0.49837148 -0.01786459
+#> 9   0.38794188 313.15  0.17973802  0.20820387
+#> 10  0.39365516 316.15 -0.64473312  1.03838827
+#> 11 -3.86319577 319.15 -1.70300698 -2.16018880
+#> 12 -1.72352435 322.15 -2.81272005  1.08919569
 ```
 
 #### 4. Plot fit
@@ -164,7 +169,6 @@ fits <- Chlorella_TRC %>%
                                    iter = 1000,
                                    param_bds = c(-1000, 1000, 0.1, 2, 0.5, 10, 285, 330),
                                    supp_errors = 'Y',
-                                   AICc = 'Y',
                                    na.action = na.omit,
                                    lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))))
 ```
@@ -175,18 +179,18 @@ A single fit can check to make sure it looks ok. Looking at `fits` demonstrates 
 # look at output object
 select(fits, curve_id, data, fit)
 #> # A tibble: 60 x 3
-#>    curve_id              data       fit
-#>       <dbl>            <list>    <list>
-#>  1        1 <tibble [12 x 3]> <S3: nls>
-#>  2        2 <tibble [12 x 3]> <S3: nls>
-#>  3        3 <tibble [12 x 3]> <S3: nls>
-#>  4        4  <tibble [9 x 3]> <S3: nls>
-#>  5        5 <tibble [12 x 3]> <S3: nls>
-#>  6        6 <tibble [12 x 3]> <S3: nls>
-#>  7        7 <tibble [12 x 3]> <S3: nls>
-#>  8        8 <tibble [10 x 3]> <S3: nls>
-#>  9        9  <tibble [8 x 3]> <S3: nls>
-#> 10       10 <tibble [10 x 3]> <S3: nls>
+#>    curve_id data              fit      
+#>       <dbl> <list>            <list>   
+#>  1     1.00 <tibble [12 × 3]> <S3: nls>
+#>  2     2.00 <tibble [12 × 3]> <S3: nls>
+#>  3     3.00 <tibble [12 × 3]> <S3: nls>
+#>  4     4.00 <tibble [9 × 3]>  <S3: nls>
+#>  5     5.00 <tibble [12 × 3]> <S3: nls>
+#>  6     6.00 <tibble [12 × 3]> <S3: nls>
+#>  7     7.00 <tibble [12 × 3]> <S3: nls>
+#>  8     8.00 <tibble [10 × 3]> <S3: nls>
+#>  9     9.00 <tibble [8 × 3]>  <S3: nls>
+#> 10    10.0  <tibble [10 × 3]> <S3: nls>
 #> # ... with 50 more rows
 
 # look at a single fit
@@ -244,18 +248,18 @@ Looking at **info** allows us to see if all the models converged.
 ``` r
 select(info, curve_id, logLik, AIC, BIC, deviance, df.residual)
 #> # A tibble: 60 x 6
-#>    curve_id      logLik       AIC       BIC  deviance df.residual
-#>       <dbl>       <dbl>     <dbl>     <dbl>     <dbl>       <int>
-#>  1        1 -14.0094789 38.018958 40.443491 7.2568273           8
-#>  2        2  -1.1969914 12.393983 14.818516 0.8577249           8
-#>  3        3  -7.3855699 24.771140 27.195673 2.4059814           8
-#>  4        4  -0.5234387 11.046877 12.033000 0.5919502           5
-#>  5        5 -10.8498521 31.699704 34.124237 4.2859330           8
-#>  6        6  -8.5177734 27.035547 29.460080 2.9056540           8
-#>  7        7  -1.2867882 12.573576 14.998110 0.8706583           8
-#>  8        8 -13.3622709 36.724542 38.237467 8.4753522           6
-#>  9        9   1.8203869  6.359226  6.756434 0.2971458           4
-#> 10       10  -1.2689999 12.538000 14.050925 0.7546570           6
+#>    curve_id  logLik   AIC   BIC deviance df.residual
+#>       <dbl>   <dbl> <dbl> <dbl>    <dbl>       <int>
+#>  1     1.00 -14.0   38.0  40.4     7.26            8
+#>  2     2.00 - 1.20  12.4  14.8     0.858           8
+#>  3     3.00 - 7.39  24.8  27.2     2.41            8
+#>  4     4.00 - 0.523 11.0  12.0     0.592           5
+#>  5     5.00 -10.8   31.7  34.1     4.29            8
+#>  6     6.00 - 8.52  27.0  29.5     2.91            8
+#>  7     7.00 - 1.29  12.6  15.0     0.871           8
+#>  8     8.00 -13.4   36.7  38.2     8.48            6
+#>  9     9.00   1.82   6.36  6.76    0.297           4
+#> 10    10.0  - 1.27  12.5  14.1     0.755           6
 #> # ... with 50 more rows
 ```
 
