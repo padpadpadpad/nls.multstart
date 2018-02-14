@@ -90,7 +90,8 @@ d_1 <- subset(Chlorella_TRC, curve_id == 1)
 fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = d_1,
                      iter = 500,
-                     param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                     start_lower = c(-10, 0.1, 0.5, 285),
+                     start_upper = c(10, 2, 5, 330),
                      supp_errors = 'Y',
                      na.action = na.omit,
                      lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
@@ -102,7 +103,7 @@ fit
 
 This fit can then be tidied up in various ways using the R package __broom__. Each different function in __broom__ returns a different set of information. __tidy()__ returns the estimated parameters, __augment()__ returns the predictions and __glance()__ returns information about the model such as AIC score. Confidence intervals of non-linear regression can also be estimated using __nlstools::confint2()__
 
-```{r look_at_data}
+```{r look_at_data, warning=FALSE}
 # get info
 info <- glance(fit)
 info
@@ -122,7 +123,6 @@ select(params, -c(statistic, p.value))
 # get predictions
 preds <- augment(fit)
 preds
-
 ```
 
 #### 4. Plot fit
@@ -151,7 +151,8 @@ fits <- Chlorella_TRC %>%
   mutate(fit = purrr::map(data, ~ nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                                    data = .x,
                                    iter = 1000,
-                                   param_bds = c(-1000, 1000, 0.1, 2, 0.5, 10, 285, 330),
+                                   start_lower = c(-1000, 0.1, 0.5, 285),
+                                   start_upper = c(1000, 2, 10, 330),
                                    supp_errors = 'Y',
                                    na.action = na.omit,
                                    lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))))
@@ -171,7 +172,7 @@ summary(fits$fit[[1]])
 
 These fits can be cleaned up in a similar way to the single fit, but this time __purrr::map()__ iterates the __broom__ function over the grouping variables.
 
-```{r, tidy_many_fits}
+```{r, tidy_many_fits, warning=FALSE}
 # get summary
 info <- fits %>%
   unnest(fit %>% map(glance))
@@ -209,7 +210,7 @@ When plotting non-linear fits, it often looks better to have a smooth curve, eve
 
 However, when predicting for many different fits, it is not certain that each curve has the same range of predictor variables. Consequently, we need to filter each new prediction by the __min()__ and __max()__ of the predictor variables.
 
-```{r, create_new_preds}
+```{r, create_new_preds, warning=FALSE}
 # new data frame of predictions
 new_preds <- Chlorella_TRC %>%
   do(., data.frame(K = seq(min(.$K), max(.$K), length.out = 150), stringsAsFactors = FALSE))
