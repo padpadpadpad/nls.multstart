@@ -4,47 +4,63 @@
 \alias{nls_multstart}
 \title{Finds the best fit of non-linear model based on AIC score}
 \usage{
-nls_multstart(formula, data = parent.frame(), iter, param_bds,
+nls_multstart(formula, data = parent.frame(), iter, start_lower, start_upper,
   supp_errors = c("Y", "N"), convergence_count = 100, control, ...)
 }
 \arguments{
-\item{formula}{a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right}
+\item{formula}{a non-linear model formula, with the response on the left of a
+~ operator and an expression involving parameters on the right}
 
-\item{data}{data.frame (optional) in which to evaluate the variables in \code{formula} and \code{weights}}
+\item{data}{(optional) data.frame, list or environment in which to evaluate
+the variables in \code{formula} and \code{weights}}
 
 \item{iter}{number of combinations of starting parameters which will be tried
-. If a single value is provided, then a shotgun/random-search approach will be used to sample
-starting parameters from a uniform distribution within the starting parameter bounds. If a vector of the same length as the number of
-parameters is provided, then a gridstart approach will be used to define each combination of that number of equally spaced intervals across each of the
-starting parameter bounds respectively. Thus, c(5,5,5) for three fitted parameters yields 125 model fits.  Supplying a vector for \code{iter} should will override \code{convergence_count}.}
+. If a single value is provided, then a shotgun/random-search approach will
+be used to sample starting parameters from a uniform distribution within the
+starting parameter bounds. If a vector of the same length as the number of
+parameters is provided, then a gridstart approach will be used to define
+each combination of that number of equally spaced intervals across each of
+the starting parameter bounds respectively. Thus, c(5,5,5) for three fitted
+parameters yields 125 model fits.  Supplying a vector for \code{iter} should
+will override \code{convergence_count}.}
 
-\item{param_bds}{lower and upper boundaries for the start parameters. If
-missing these default to +/- 1e+09. Need to specified as a vector as :
-c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
-param 2 etc)}
+\item{start_lower}{lower boundaries for the start parameters. If missing, this
+will default to -1e+10.}
 
-\item{supp_errors}{if \code{supp_errors = 'Y'}, then no error messages will be shown
-from the nlsLM function, reducing the number of error messages
-printed while the model attempts to converge using poor starting parameters. Advised to only use \code{supp_errors = 'Y'} when you are confident in the bounds of your starting parameters.}
+\item{start_upper}{upper boundaries for the start parameters. If missing, this
+will default to 1e+10.}
 
-\item{convergence_count}{The number of counts that the winning model should be undefeated for before it is declared the winner. This
-argument defaults to 100. If specified as FALSE, then all of the iterations will be fitted, and the best model selected. Note that
-\code{convergence_count} can only be used with a shotgun/random-search approach, and not with a gridstart approach. This argument will
-be ignored if a gridstart approach is specified by a vector input for \code{iter}.}
+\item{supp_errors}{if \code{supp_errors = 'Y'}, then no error messages will be
+shown from the nlsLM function, reducing the number of error messages printed
+while the model attempts to converge using poor starting parameters. Advised
+to only use \code{supp_errors = 'Y'} when you are confident in the bounds of
+your starting parameters.}
 
-\item{control}{specific control can be specified using \code{\link[minpack.lm]{nls.lm.control}}.}
+\item{convergence_count}{The number of counts that the winning model should be
+undefeated for before it is declared the winner. This argument defaults to
+100. If specified as FALSE, then all of the iterations will be fitted, and
+the best model selected. Note that \code{convergence_count} can only be used
+with a shotgun/random-search approach, and not with a gridstart approach.
+This argument will be ignored if a gridstart approach is specified by a
+vector input for \code{iter}.}
 
-\item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.}
+\item{control}{specific control can be specified using
+\code{\link[minpack.lm]{nls.lm.control}}.}
+
+\item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
+necessary.}
 }
 \value{
 returns a nls object of the best estimated model fit
 }
 \description{
-Finds the best estimated model using non-linear least squares regression using nlsLM(). The best fit is determined using AIC scores.
+Finds the best estimated model using non-linear least squares regression using
+nlsLM(). The best fit is determined using AIC scores.
 }
 \note{
-Useful additional arguments for \code{\link[minpack.lm]{nlsLM}} include: \code{na.action = na.omit},
-\code{lower/upper = c()} where these represent upper and lower boundaries for parameter estimates
+Useful additional arguments for \code{\link[minpack.lm]{nlsLM}} include:
+ \code{na.action = na.omit}, \code{lower/upper = c()} where these represent
+ upper and lower boundaries for parameter estimates
 }
 \examples{
 # load in data
@@ -66,13 +82,15 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
 fits <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                 data = Chlorella_TRC_test,
                 iter = 500,
-                param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                start_lower = c(-10, 0.1, 0.5, 285),
+                start_upper = c(10, 2, 5, 330),
                 lower = c(lnc=-10, E=0, Eh=0, Th=0),
                 supp_errors = 'Y')
 
 }
 \seealso{
-\code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
+\code{\link[minpack.lm]{nlsLM}} for details on additional arguments
+to pass to the nlsLM function.
 }
 \author{
 Daniel Padfield

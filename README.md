@@ -75,7 +75,8 @@ d_1 <- subset(Chlorella_TRC, curve_id == 1)
 fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = d_1,
                      iter = 500,
-                     param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                     start_lower = c(-10, 0.1, 0.5, 285),
+                     start_upper = c(10, 2, 5, 330),
                      supp_errors = 'Y',
                      na.action = na.omit,
                      lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
@@ -88,7 +89,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 12 
+#> Number of iterations to convergence: 19 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -117,27 +118,27 @@ CI <- confint2(fit) %>%
 params <- bind_cols(params, CI)
 select(params, -c(statistic, p.value))
 #>   term    estimate std.error     conf.low   conf.high
-#> 1  lnc  -1.3462105 0.4656398  -2.41997788  -0.2724432
-#> 2    E   0.9877306 0.4521481  -0.05492466   2.0303859
-#> 3   Eh   4.3326453 1.4877827   0.90181225   7.7634783
-#> 4   Th 312.1887460 3.8781636 303.24568469 321.1318074
+#> 1  lnc  -1.3462105 0.4656398  -2.41997789  -0.2724432
+#> 2    E   0.9877307 0.4521481  -0.05492465   2.0303860
+#> 3   Eh   4.3326452 1.4877827   0.90181222   7.7634783
+#> 4   Th 312.1887459 3.8781637 303.24568433 321.1318074
 
 # get predictions
 preds <- augment(fit)
 preds
 #>        ln.rate      K     .fitted      .resid
-#> 1  -2.06257833 289.15 -1.88694033 -0.17563800
-#> 2  -1.32437939 292.15 -1.48002015  0.15564076
+#> 1  -2.06257833 289.15 -1.88694035 -0.17563798
+#> 2  -1.32437939 292.15 -1.48002017  0.15564078
 #> 3  -0.95416807 295.15 -1.08143501  0.12726694
 #> 4  -0.79443675 298.15 -0.69121465 -0.10322210
-#> 5  -0.18203642 301.15 -0.31058073  0.12854431
-#> 6   0.17424007 304.15  0.05336432  0.12087575
-#> 7  -0.04462754 307.15  0.36657462 -0.41120215
-#> 8   0.48050690 310.15  0.49837148 -0.01786459
-#> 9   0.38794188 313.15  0.17973802  0.20820387
-#> 10  0.39365516 316.15 -0.64473312  1.03838827
-#> 11 -3.86319577 319.15 -1.70300698 -2.16018880
-#> 12 -1.72352435 322.15 -2.81272005  1.08919569
+#> 5  -0.18203642 301.15 -0.31058072  0.12854430
+#> 6   0.17424007 304.15  0.05336433  0.12087574
+#> 7  -0.04462754 307.15  0.36657463 -0.41120217
+#> 8   0.48050690 310.15  0.49837149 -0.01786459
+#> 9   0.38794188 313.15  0.17973800  0.20820388
+#> 10  0.39365516 316.15 -0.64473313  1.03838829
+#> 11 -3.86319577 319.15 -1.70300697 -2.16018880
+#> 12 -1.72352435 322.15 -2.81272002  1.08919567
 ```
 
 #### 4. Plot fit
@@ -167,7 +168,8 @@ fits <- Chlorella_TRC %>%
   mutate(fit = purrr::map(data, ~ nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                                    data = .x,
                                    iter = 1000,
-                                   param_bds = c(-1000, 1000, 0.1, 2, 0.5, 10, 285, 330),
+                                   start_lower = c(-1000, 0.1, 0.5, 285),
+                                   start_upper = c(1000, 2, 10, 330),
                                    supp_errors = 'Y',
                                    na.action = na.omit,
                                    lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))))
@@ -181,16 +183,16 @@ select(fits, curve_id, data, fit)
 #> # A tibble: 60 x 3
 #>    curve_id data              fit      
 #>       <dbl> <list>            <list>   
-#>  1     1.00 <tibble [12 × 3]> <S3: nls>
-#>  2     2.00 <tibble [12 × 3]> <S3: nls>
-#>  3     3.00 <tibble [12 × 3]> <S3: nls>
-#>  4     4.00 <tibble [9 × 3]>  <S3: nls>
-#>  5     5.00 <tibble [12 × 3]> <S3: nls>
-#>  6     6.00 <tibble [12 × 3]> <S3: nls>
-#>  7     7.00 <tibble [12 × 3]> <S3: nls>
-#>  8     8.00 <tibble [10 × 3]> <S3: nls>
-#>  9     9.00 <tibble [8 × 3]>  <S3: nls>
-#> 10    10.0  <tibble [10 × 3]> <S3: nls>
+#>  1     1.00 <tibble [12 x 3]> <S3: nls>
+#>  2     2.00 <tibble [12 x 3]> <S3: nls>
+#>  3     3.00 <tibble [12 x 3]> <S3: nls>
+#>  4     4.00 <tibble [9 x 3]>  <S3: nls>
+#>  5     5.00 <tibble [12 x 3]> <S3: nls>
+#>  6     6.00 <tibble [12 x 3]> <S3: nls>
+#>  7     7.00 <tibble [12 x 3]> <S3: nls>
+#>  8     8.00 <tibble [10 x 3]> <S3: nls>
+#>  9     9.00 <tibble [8 x 3]>  <S3: nls>
+#> 10    10.0  <tibble [10 x 3]> <S3: nls>
 #> # ... with 50 more rows
 
 # look at a single fit
@@ -209,7 +211,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 14 
+#> Number of iterations to convergence: 11 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -302,6 +304,31 @@ ggplot() +
   ylab('log Metabolic rate') +
   xlab('Assay temperature (ºC)') +
   theme(legend.position = c(0.9, 0.15))
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
+#> $y, : font family not found in Windows font database
+
+#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
+#> $y, : font family not found in Windows font database
+
+#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
+#> $y, : font family not found in Windows font database
 ```
 
 ![](README-plot_many_fits-1.png)
@@ -322,6 +349,31 @@ ggplot(params, aes(col = flux)) +
   theme(legend.position = 'top') +
   xlab('curve') +
   ylab('parameter estimate')
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+
+#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
+#> font family not found in Windows font database
+#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
+#> $y, : font family not found in Windows font database
+
+#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
+#> $y, : font family not found in Windows font database
+
+#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
+#> $y, : font family not found in Windows font database
 ```
 
 ![](README-confint_plot-1.png)
