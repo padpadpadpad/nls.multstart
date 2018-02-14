@@ -89,7 +89,7 @@ d_1 <- subset(Chlorella_TRC, curve_id == 1)
 # run nls_multstart
 fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = d_1,
-                     iter = 500,
+                     iter = 250,
                      start_lower = c(-10, 0.1, 0.5, 285),
                      start_upper = c(10, 2, 5, 330),
                      supp_errors = 'Y',
