@@ -98,14 +98,14 @@ nls_multstart <-
 
     if (missing(start_lower) || missing(start_upper)) {
       cat(
-        "No boundaries specified for the sought parameters. \n",
+        "No boundaries specified for the starting values of sought parameters. \n",
         "Default values of +/- 1e+10 will be used. This is likely \n",
         "to slow the process of finding the best model. \n"
       )
       r <- readline("Continue with default values [y/n]? ")
 
       if (tolower(r) == "n") {
-        stop("Please enter upper and lower parameter boundaries as param_bds in function argument.")
+        stop("Please enter upper and lower parameter boundaries as start_lower and start_upper in function argument.")
       }
     }
 
@@ -199,8 +199,8 @@ nls_multstart <-
             formula,
             start = start.vals,
             control = control,
-            data = data,
-            weights = weights, ...
+            data = data #,
+            #weights = weights, ...
           ),
           silent = silent
         )
@@ -243,16 +243,30 @@ nls_multstart <-
       fit_aic <- function(startpars) {
         start.vals <- as.list(startpars[[1]])
 
-        try(
-          fit <- minpack.lm::nlsLM(
-            formula,
-            start = start.vals,
-            control = control,
-            data = data,
-            weights = weights, ...
-          ),
-          silent = silent
-        )
+        if(missing(weights)){
+          try(
+            fit <- minpack.lm::nlsLM(
+              formula,
+              start = start.vals,
+              control = control,
+              data = data, ...
+            ),
+            silent = silent
+          )
+        }
+        else{
+          try(
+            fit <- minpack.lm::nlsLM(
+              formula,
+              start = start.vals,
+              control = control,
+              data = data,
+              weights = weights, ...
+            ),
+            silent = silent
+          )
+        }
+
         AICval <- ifelse(!is.null(fit), AIC(fit), Inf)
 
         return(AICval)
