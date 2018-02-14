@@ -34,6 +34,7 @@
 #'  vector input for \code{iter}.
 #' @param control specific control can be specified using
 #'  \code{\link[minpack.lm]{nls.lm.control}}.
+#' @param weights an optional numeric vector of weights for the nls.
 #' @param \dots Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
 #'  necessary.
 #' @return returns a nls object of the best estimated model fit
@@ -74,7 +75,8 @@
 nls_multstart <-
   # arguments needed for nls_multstart ####
   function(formula, data = parent.frame(), iter, start_lower, start_upper,
-           supp_errors = c("Y", "N"), convergence_count = 100, control, ...) {
+           supp_errors = c("Y", "N"), convergence_count = 100, control,
+           weights, ...) {
 
     # set default values
     if (missing(supp_errors)) {
@@ -197,7 +199,8 @@ nls_multstart <-
             formula,
             start = start.vals,
             control = control,
-            data = data, ...
+            data = data,
+            weights = weights, ...
           ),
           silent = silent
         )
@@ -245,7 +248,8 @@ nls_multstart <-
             formula,
             start = start.vals,
             control = control,
-            data = data, ...
+            data = data,
+            weights = weights, ...
           ),
           silent = silent
         )
@@ -265,7 +269,8 @@ nls_multstart <-
         formula,
         start = allfits$startpars[[1]],
         control = control,
-        data = data, ...
+        data = data,
+        weights = weights, ...
       )
     }
 
