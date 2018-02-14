@@ -12,7 +12,7 @@ Granville Matheson: <mathesong@gmail.com>
 
 ### Issues and suggestions
 
-Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email <d.padfield@exeter.ac.uk>.
+Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email <d.padfield@exeter.ac.uk> or <mathesong@gmail.com>.
 
 [![Travis-CI Build Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart)
 
@@ -88,7 +88,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 12 
+#> Number of iterations to convergence: 16 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -117,27 +117,27 @@ CI <- confint2(fit) %>%
 params <- bind_cols(params, CI)
 select(params, -c(statistic, p.value))
 #>   term    estimate std.error     conf.low   conf.high
-#> 1  lnc  -1.3462105 0.4656398  -2.41997788  -0.2724432
-#> 2    E   0.9877306 0.4521481  -0.05492466   2.0303859
-#> 3   Eh   4.3326453 1.4877827   0.90181225   7.7634783
-#> 4   Th 312.1887460 3.8781636 303.24568469 321.1318074
+#> 1  lnc  -1.3462105 0.4656398  -2.41997789  -0.2724432
+#> 2    E   0.9877306 0.4521481  -0.05492466   2.0303860
+#> 3   Eh   4.3326452 1.4877827   0.90181221   7.7634782
+#> 4   Th 312.1887459 3.8781637 303.24568445 321.1318074
 
 # get predictions
 preds <- augment(fit)
 preds
 #>        ln.rate      K     .fitted      .resid
-#> 1  -2.06257833 289.15 -1.88694033 -0.17563800
-#> 2  -1.32437939 292.15 -1.48002015  0.15564076
+#> 1  -2.06257833 289.15 -1.88694034 -0.17563799
+#> 2  -1.32437939 292.15 -1.48002016  0.15564077
 #> 3  -0.95416807 295.15 -1.08143501  0.12726694
-#> 4  -0.79443675 298.15 -0.69121465 -0.10322210
+#> 4  -0.79443675 298.15 -0.69121466 -0.10322209
 #> 5  -0.18203642 301.15 -0.31058073  0.12854431
 #> 6   0.17424007 304.15  0.05336432  0.12087575
-#> 7  -0.04462754 307.15  0.36657462 -0.41120215
-#> 8   0.48050690 310.15  0.49837148 -0.01786459
-#> 9   0.38794188 313.15  0.17973802  0.20820387
-#> 10  0.39365516 316.15 -0.64473312  1.03838827
-#> 11 -3.86319577 319.15 -1.70300698 -2.16018880
-#> 12 -1.72352435 322.15 -2.81272005  1.08919569
+#> 7  -0.04462754 307.15  0.36657461 -0.41120215
+#> 8   0.48050690 310.15  0.49837147 -0.01786457
+#> 9   0.38794188 313.15  0.17973799  0.20820389
+#> 10  0.39365516 316.15 -0.64473314  1.03838829
+#> 11 -3.86319577 319.15 -1.70300698 -2.16018879
+#> 12 -1.72352435 322.15 -2.81272003  1.08919567
 ```
 
 #### 4. Plot fit
