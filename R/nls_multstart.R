@@ -5,8 +5,8 @@
 #'
 #' @param formula a non-linear model formula, with the response on the left of a
 #'  ~ operator and an expression involving parameters on the right
-#' @param data data.frame (optional) in which to evaluate the variables in
-#'  \code{formula} and \code{weights}
+#' @param data (optional) data.frame, list or environment in which to evaluate
+#'  the variables in \code{formula} and \code{weights}
 #' @param iter number of combinations of starting parameters which will be tried
 #'  . If a single value is provided, then a shotgun/random-search approach will
 #'  be used to sample starting parameters from a uniform distribution within the
@@ -95,11 +95,16 @@ nls_multstart <-
     # set up parameter boundaries ####
 
     if (missing(start_lower) || missing(start_upper)) {
-      warning(paste0(
-        "Upper and/or lower bounds not specified for starting parameters.\n",
-        "Default values of +/- 1e+10 will be used. This is likely to slow\n",
-        "the process of finding the best model.\n"
-      ))
+      cat(
+        "No boundaries specified for the sought parameters. \n",
+        "Default values of +/- 1e+10 will be used. This is likely \n",
+        "to slow the process of finding the best model. \n"
+      )
+      r <- readline("Continue with default values [y/n]? ")
+
+      if (tolower(r) == "n") {
+        stop("Please enter upper and lower parameter boundaries as param_bds in function argument.")
+      }
     }
 
     if (missing(start_lower)) start_lower <- rep(-10 ^ 10, length(params_est))
