@@ -5,7 +5,7 @@
 \title{Finds the best fit of non-linear model based on AIC score}
 \usage{
 nls_multstart(formula, data = parent.frame(), iter, start_lower, start_upper,
-  supp_errors = c("Y", "N"), convergence_count = 100, control, ...)
+  supp_errors = c("Y", "N"), convergence_count = 100, control, weights, ...)
 }
 \arguments{
 \item{formula}{a non-linear model formula, with the response on the left of a
@@ -46,6 +46,8 @@ vector input for \code{iter}.}
 
 \item{control}{specific control can be specified using
 \code{\link[minpack.lm]{nls.lm.control}}.}
+
+\item{weights}{an optional numeric vector of weights for the nls.}
 
 \item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
 necessary.}
