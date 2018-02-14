@@ -3,10 +3,10 @@ Type: Package
 Title: Robust Non-Linear regression using AIC scores
 Version: 0.1.1
 Authors@R: c(
-    person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = "cre"),
+    person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = c("aut", "cre")),
     person("Granville", "Matheson", email = "mathesong@gmail.com", role = "aut"))
 Maintainer: Daniel Padfield <d.padfield@exeter.ac.uk>
-Description: Robust non-linear regression using multiple starting points
+Description: Robust non-linear regression using multiple starting points.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
