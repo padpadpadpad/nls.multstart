@@ -89,7 +89,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 17 
+#> Number of iterations to convergence: 21 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -119,26 +119,26 @@ params <- bind_cols(params, CI)
 select(params, -c(statistic, p.value))
 #>   term    estimate std.error     conf.low   conf.high
 #> 1  lnc  -1.3462105 0.4656398  -2.41997789  -0.2724432
-#> 2    E   0.9877307 0.4521481  -0.05492465   2.0303860
-#> 3   Eh   4.3326453 1.4877827   0.90181230   7.7634783
-#> 4   Th 312.1887459 3.8781636 303.24568452 321.1318072
+#> 2    E   0.9877307 0.4521481  -0.05492466   2.0303860
+#> 3   Eh   4.3326453 1.4877827   0.90181228   7.7634783
+#> 4   Th 312.1887460 3.8781636 303.24568460 321.1318074
 
 # get predictions
 preds <- augment(fit)
 preds
-#>        ln.rate      K X.weights.     .fitted     .resid
-#> 1  -2.06257833 289.15          1 -1.88694036 -0.1756380
-#> 2  -1.32437939 292.15          1 -1.48002018  0.1556408
-#> 3  -0.95416807 295.15          1 -1.08143502  0.1272669
-#> 4  -0.79443675 298.15          1 -0.69121465 -0.1032221
-#> 5  -0.18203642 301.15          1 -0.31058072  0.1285443
-#> 6   0.17424007 304.15          1  0.05336434  0.1208757
-#> 7  -0.04462754 307.15          1  0.36657464 -0.4112022
-#> 8   0.48050690 310.15          1  0.49837150 -0.0178646
-#> 9   0.38794188 313.15          1  0.17973801  0.2082039
-#> 10  0.39365516 316.15          1 -0.64473313  1.0383883
-#> 11 -3.86319577 319.15          1 -1.70300699 -2.1601888
-#> 12 -1.72352435 322.15          1 -2.81272005  1.0891957
+#>        ln.rate      K X.weights.     .fitted      .resid
+#> 1  -2.06257833 289.15          1 -1.88694035 -0.17563798
+#> 2  -1.32437939 292.15          1 -1.48002017  0.15564078
+#> 3  -0.95416807 295.15          1 -1.08143502  0.12726695
+#> 4  -0.79443675 298.15          1 -0.69121466 -0.10322209
+#> 5  -0.18203642 301.15          1 -0.31058074  0.12854431
+#> 6   0.17424007 304.15          1  0.05336432  0.12087575
+#> 7  -0.04462754 307.15          1  0.36657462 -0.41120215
+#> 8   0.48050690 310.15          1  0.49837148 -0.01786459
+#> 9   0.38794188 313.15          1  0.17973802  0.20820387
+#> 10  0.39365516 316.15          1 -0.64473311  1.03838827
+#> 11 -3.86319577 319.15          1 -1.70300696 -2.16018881
+#> 12 -1.72352435 322.15          1 -2.81272003  1.08919567
 ```
 
 #### 4. Plot fit
@@ -183,16 +183,16 @@ select(fits, curve_id, data, fit)
 #> # A tibble: 60 x 3
 #>    curve_id data              fit      
 #>       <dbl> <list>            <list>   
-#>  1     1.00 <tibble [12 x 3]> <S3: nls>
-#>  2     2.00 <tibble [12 x 3]> <S3: nls>
-#>  3     3.00 <tibble [12 x 3]> <S3: nls>
-#>  4     4.00 <tibble [9 x 3]>  <S3: nls>
-#>  5     5.00 <tibble [12 x 3]> <S3: nls>
-#>  6     6.00 <tibble [12 x 3]> <S3: nls>
-#>  7     7.00 <tibble [12 x 3]> <S3: nls>
-#>  8     8.00 <tibble [10 x 3]> <S3: nls>
-#>  9     9.00 <tibble [8 x 3]>  <S3: nls>
-#> 10    10.0  <tibble [10 x 3]> <S3: nls>
+#>  1     1.00 <tibble [12 × 3]> <S3: nls>
+#>  2     2.00 <tibble [12 × 3]> <S3: nls>
+#>  3     3.00 <tibble [12 × 3]> <S3: nls>
+#>  4     4.00 <tibble [9 × 3]>  <S3: nls>
+#>  5     5.00 <tibble [12 × 3]> <S3: nls>
+#>  6     6.00 <tibble [12 × 3]> <S3: nls>
+#>  7     7.00 <tibble [12 × 3]> <S3: nls>
+#>  8     8.00 <tibble [10 × 3]> <S3: nls>
+#>  9     9.00 <tibble [8 × 3]>  <S3: nls>
+#> 10    10.0  <tibble [10 × 3]> <S3: nls>
 #> # ... with 50 more rows
 
 # look at a single fit
@@ -211,7 +211,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 38 
+#> Number of iterations to convergence: 17 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -300,35 +300,10 @@ ggplot() +
   geom_line(aes(K - 273.15, ln.rate, col = flux, group = curve_id), alpha = 0.5, preds2) +
   facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = FALSE)) +
   scale_colour_manual(values = c('green4', 'black')) +
-  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme_bw(base_size = 12) +
   ylab('log Metabolic rate') +
   xlab('Assay temperature (ºC)') +
   theme(legend.position = c(0.9, 0.15))
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
-#> $y, : font family not found in Windows font database
-
-#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
-#> $y, : font family not found in Windows font database
-
-#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
-#> $y, : font family not found in Windows font database
 ```
 
 ![](README-plot_many_fits-1.png)
@@ -345,35 +320,10 @@ ggplot(params, aes(col = flux)) +
   geom_linerange(aes(curve_id, ymin = conf.low, ymax = conf.high)) +
   coord_flip() +
   scale_color_manual(values = c('green4', 'black')) +
-  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme_bw(base_size = 12) +
   theme(legend.position = 'top') +
   xlab('curve') +
   ylab('parameter estimate')
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-
-#> Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, :
-#> font family not found in Windows font database
-#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
-#> $y, : font family not found in Windows font database
-
-#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
-#> $y, : font family not found in Windows font database
-
-#> Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x
-#> $y, : font family not found in Windows font database
 ```
 
 ![](README-confint_plot-1.png)

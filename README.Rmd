@@ -240,7 +240,7 @@ ggplot() +
   geom_line(aes(K - 273.15, ln.rate, col = flux, group = curve_id), alpha = 0.5, preds2) +
   facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = FALSE)) +
   scale_colour_manual(values = c('green4', 'black')) +
-  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme_bw(base_size = 12) +
   ylab('log Metabolic rate') +
   xlab('Assay temperature (ºC)') +
   theme(legend.position = c(0.9, 0.15))
@@ -258,7 +258,7 @@ ggplot(params, aes(col = flux)) +
   geom_linerange(aes(curve_id, ymin = conf.low, ymax = conf.high)) +
   coord_flip() +
   scale_color_manual(values = c('green4', 'black')) +
-  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme_bw(base_size = 12) +
   theme(legend.position = 'top') +
   xlab('curve') +
   ylab('parameter estimate')
