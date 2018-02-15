@@ -87,8 +87,8 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
 fits <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                 data = Chlorella_TRC_test,
                 iter = 500,
-                start_lower = c(-10, 0.1, 0.5, 285),
-                start_upper = c(10, 2, 5, 330),
+                start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
+                start_upper = c(lnc=10, E=2, Eh=5, Th=330),
                 lower = c(lnc=-10, E=0, Eh=0, Th=0),
                 supp_errors = 'Y')
 
