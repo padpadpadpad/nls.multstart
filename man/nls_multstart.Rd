@@ -5,14 +5,15 @@
 \title{Finds the best fit of non-linear model based on AIC score}
 \usage{
 nls_multstart(formula, data = parent.frame(), iter, start_lower, start_upper,
-  supp_errors = c("Y", "N"), convergence_count = 100, control, weights, ...)
+  supp_errors = c("Y", "N"), convergence_count = 100, control, modelweights,
+  ...)
 }
 \arguments{
 \item{formula}{a non-linear model formula, with the response on the left of a
 ~ operator and an expression involving parameters on the right}
 
 \item{data}{(optional) data.frame, list or environment in which to evaluate
-the variables in \code{formula} and \code{weights}}
+the variables in \code{formula} and \code{modelweights}}
 
 \item{iter}{number of combinations of starting parameters which will be tried
 . If a single value is provided, then a shotgun/random-search approach will
@@ -47,7 +48,7 @@ vector input for \code{iter}.}
 \item{control}{specific control can be specified using
 \code{\link[minpack.lm]{nls.lm.control}}.}
 
-\item{weights}{Optional model weights for the nls. If \code{data} is specified,
+\item{modelweights}{Optional model weights for the nls. If \code{data} is specified,
 then this argument should be the name of the numeric weights vector within
 the \code{data} object.}
 
@@ -86,8 +87,8 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
 fits <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                 data = Chlorella_TRC_test,
                 iter = 500,
-                start_lower = c(-10, 0.1, 0.5, 285),
-                start_upper = c(10, 2, 5, 330),
+                start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
+                start_upper = c(lnc=10, E=2, Eh=5, Th=330),
                 lower = c(lnc=-10, E=0, Eh=0, Th=0),
                 supp_errors = 'Y')
 

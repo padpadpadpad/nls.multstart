@@ -18,6 +18,8 @@ Imports: minpack.lm,
     dplyr,
     tidyr,
     tibble
-Suggests: ggplot2,
+Suggests: 
+    ggplot2,
     broom,
-    nlstools
+    nlstools,
+    testthat

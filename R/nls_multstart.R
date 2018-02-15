@@ -6,7 +6,7 @@
 #' @param formula a non-linear model formula, with the response on the left of a
 #'  ~ operator and an expression involving parameters on the right
 #' @param data (optional) data.frame, list or environment in which to evaluate
-#'  the variables in \code{formula} and \code{weights}
+#'  the variables in \code{formula} and \code{modelweights}
 #' @param iter number of combinations of starting parameters which will be tried
 #'  . If a single value is provided, then a shotgun/random-search approach will
 #'  be used to sample starting parameters from a uniform distribution within the
@@ -34,7 +34,7 @@
 #'  vector input for \code{iter}.
 #' @param control specific control can be specified using
 #'  \code{\link[minpack.lm]{nls.lm.control}}.
-#' @param weights Optional model weights for the nls. If \code{data} is specified,
+#' @param modelweights Optional model weights for the nls. If \code{data} is specified,
 #'  then this argument should be the name of the numeric weights vector within
 #'  the \code{data} object.
 #' @param \dots Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
@@ -67,8 +67,8 @@
 #' fits <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
 #'                 data = Chlorella_TRC_test,
 #'                 iter = 500,
-#'                 start_lower = c(-10, 0.1, 0.5, 285),
-#'                 start_upper = c(10, 2, 5, 330),
+#'                 start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
+#'                 start_upper = c(lnc=10, E=2, Eh=5, Th=330),
 #'                 lower = c(lnc=-10, E=0, Eh=0, Th=0),
 #'                 supp_errors = 'Y')
 #'
@@ -78,7 +78,7 @@ nls_multstart <-
   # arguments needed for nls_multstart ####
   function(formula, data = parent.frame(), iter, start_lower, start_upper,
            supp_errors = c("Y", "N"), convergence_count = 100, control,
-           weights, ...) {
+           modelweights, ...) {
 
     # set default values
     if (missing(supp_errors)) {
@@ -135,17 +135,17 @@ nls_multstart <-
     # transform input arguments
     silent <- ifelse(supp_errors == "Y", TRUE, FALSE)
 
-    if ("weights" %in% all.vars(formula)) {
+    if ("modelweights" %in% all.vars(formula)) {
       stop(paste0(
-        "The variable name 'weights' is reserved for model weights. Please change the name\n",
+        "The variable name 'modelweights' is reserved for model weights. Please change the name\n",
         "of this variable"
       ))
     }
 
-    if (missing(weights)) {
-      data$weights <- rep(1, length(data[[params_dep]]))
+    if (missing(modelweights)) {
+      data$modelweights <- rep(1, length(data[[params_dep]]))
     } else {
-      data$weights <- eval(substitute(weights), data)
+      data$modelweights <- eval(substitute(modelweights), data)
     }
 
 
@@ -193,7 +193,7 @@ nls_multstart <-
     # Fit nls model using LM optimisation across multiple starting values
 
 
-    #### Shotgun approach with convergence ####
+    #### With convergence ####
 
     if (multistart_type == "shotgun" && convergence_count != FALSE) {
 
@@ -217,7 +217,7 @@ nls_multstart <-
             start = start.vals,
             control = control,
             data = data,
-            weights = weights, ...
+            weights = modelweights, ...
           ),
           silent = silent
         )
@@ -266,7 +266,7 @@ nls_multstart <-
             start = start.vals,
             control = control,
             data = data,
-            weights = weights, ...
+            weights = modelweights, ...
           ),
           silent = silent
         )
@@ -288,7 +288,7 @@ nls_multstart <-
         start = allfits$startpars[[1]],
         control = control,
         data = data,
-        weights = weights, ...
+        weights = modelweights, ...
       )
     }
 

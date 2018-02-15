@@ -90,8 +90,8 @@ d_1 <- subset(Chlorella_TRC, curve_id == 1)
 fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = d_1,
                      iter = 250,
-                     start_lower = c(-10, 0.1, 0.5, 285),
-                     start_upper = c(10, 2, 5, 330),
+                     start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
+                     start_upper = c(lnc=10, E=2, Eh=5, Th=330),
                      supp_errors = 'Y',
                      na.action = na.omit,
                      lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
@@ -151,8 +151,8 @@ fits <- Chlorella_TRC %>%
   mutate(fit = purrr::map(data, ~ nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                                    data = .x,
                                    iter = 1000,
-                                   start_lower = c(-1000, 0.1, 0.5, 285),
-                                   start_upper = c(1000, 2, 10, 330),
+                                   start_lower = c(lnc=-1000, E=0.1, Eh=0.5, Th=285),
+                                   start_upper = c(lnc=1000, E=2, Eh=10, Th=330),
                                    supp_errors = 'Y',
                                    na.action = na.omit,
                                    lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))))
