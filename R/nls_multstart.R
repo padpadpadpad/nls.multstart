@@ -85,12 +85,6 @@ nls_multstart <-
       supp_errors <- "N"
     }
 
-    # add weights if it is missing
-    # just a list of 1s
-    if(missing(weights)){
-      data$weights <- 1
-    }
-
     # create model ####
     formula <- stats::as.formula(formula)
 
