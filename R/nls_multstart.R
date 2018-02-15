@@ -83,6 +83,12 @@ nls_multstart <-
       supp_errors <- "N"
     }
 
+    # add weights if it is missing
+    # just a list of 1s
+    if(missing(weights)){
+      data$weights <- 1
+    }
+
     # create model ####
     formula <- stats::as.formula(formula)
 
@@ -199,8 +205,8 @@ nls_multstart <-
             formula,
             start = start.vals,
             control = control,
-            data = data #,
-            #weights = weights, ...
+            data = data,
+            weights = weights, ...
           ),
           silent = silent
         )
@@ -243,19 +249,7 @@ nls_multstart <-
       fit_aic <- function(startpars) {
         start.vals <- as.list(startpars[[1]])
 
-        if(missing(weights)){
-          try(
-            fit <- minpack.lm::nlsLM(
-              formula,
-              start = start.vals,
-              control = control,
-              data = data, ...
-            ),
-            silent = silent
-          )
-        }
-        else{
-          try(
+        try(
             fit <- minpack.lm::nlsLM(
               formula,
               start = start.vals,
@@ -264,8 +258,7 @@ nls_multstart <-
               weights = weights, ...
             ),
             silent = silent
-          )
-        }
+        )
 
         AICval <- ifelse(!is.null(fit), AIC(fit), Inf)
 
