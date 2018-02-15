@@ -47,7 +47,9 @@ vector input for \code{iter}.}
 \item{control}{specific control can be specified using
 \code{\link[minpack.lm]{nls.lm.control}}.}
 
-\item{weights}{an optional numeric vector of weights for the nls.}
+\item{weights}{Optional model weights for the nls. If \code{data} is specified,
+then this argument should be the name of the numeric weights vector within
+the \code{data} object.}
 
 \item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
 necessary.}
