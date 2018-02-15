@@ -34,7 +34,9 @@
 #'  vector input for \code{iter}.
 #' @param control specific control can be specified using
 #'  \code{\link[minpack.lm]{nls.lm.control}}.
-#' @param weights an optional numeric vector of weights for the nls.
+#' @param weights Optional model weights for the nls. If \code{data} is specified,
+#'  then this argument should be the name of the numeric weights vector within
+#'  the \code{data} object.
 #' @param \dots Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
 #'  necessary.
 #' @return returns a nls object of the best estimated model fit
@@ -96,6 +98,7 @@ nls_multstart <-
     if (any(class(data) %in% c("data.frame", "list", "environment"))) {
       params_ind <- all.vars(formula[[3]])[all.vars(formula[[3]]) %in% names(data)]
       params_est <- all.vars(formula[[3]])[!all.vars(formula[[3]]) %in% names(data)]
+      params_dep <- all.vars(formula[[2]])
     } else {
       stop("data should be a data.frame, list or an environment")
     }
@@ -137,6 +140,20 @@ nls_multstart <-
 
     # transform input arguments
     silent <- ifelse(supp_errors == "Y", TRUE, FALSE)
+
+    if ("weights" %in% all.vars(formula)) {
+      stop(paste0(
+        "The variable name 'weights' is reserved for model weights. Please change the name\n",
+        "of this variable"
+      ))
+    }
+
+    if (missing(weights)) {
+      data$weights <- rep(1, length(data[[params_dep]]))
+    } else {
+      data$weights <- eval(substitute(weights), data)
+    }
+
 
     if (length(iter) == 1) {
       multistart_type <- "shotgun"
@@ -250,14 +267,14 @@ nls_multstart <-
         start.vals <- as.list(startpars[[1]])
 
         try(
-            fit <- minpack.lm::nlsLM(
-              formula,
-              start = start.vals,
-              control = control,
-              data = data,
-              weights = weights, ...
-            ),
-            silent = silent
+          fit <- minpack.lm::nlsLM(
+            formula,
+            start = start.vals,
+            control = control,
+            data = data,
+            weights = weights, ...
+          ),
+          silent = silent
         )
 
         AICval <- ifelse(!is.null(fit), AIC(fit), Inf)
