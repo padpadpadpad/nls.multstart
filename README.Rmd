@@ -10,7 +10,7 @@ output:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-"
+  fig.path = "inst/image/README-"
 )
 ```
 
@@ -56,7 +56,7 @@ devtools::install_github("padpadpadpad/nls.multstart")
 
 #### 2. Run nls_multstart()
 
-__nls_multstart()__ can be used to do non-linear regression on a single curve
+__nls_multstart()__ can be used to do non-linear regression on a single curve.
 
 ```{r run_nlsLoop_prep, message=FALSE, warning=FALSE, results='hide'}
 
@@ -86,10 +86,29 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
 # subset dataset
 d_1 <- subset(Chlorella_TRC, curve_id == 1)
 
-# run nls_multstart
+# run nls_multstart with shotgun approach
 fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = d_1,
                      iter = 250,
+                     start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
+                     start_upper = c(lnc=10, E=2, Eh=5, Th=330),
+                     supp_errors = 'Y',
+                     convergence_count = 100,
+                     na.action = na.omit,
+                     lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
+
+fit
+```
+
+This method uses a random-search/shotgun approach to fit multiple curves. Random start parameter values are picked from a uniform distribution between `start_lower()` and `start_upper()` for each parameter. If the best model is not improved upon (in terms of AIC score) for 100 new start parameter combinations, the function will return that model fit. This is controlled by `convergence_count`, if this is set to `FALSE`, __nls_multstart()__ will try and fit all iterations.
+
+Another method of model fitting available in __nls_multstart()__ is a gridstart approach. This method creates a combination of start parameters, equally spaced across each of the starting parameter bounds. This can be specified with a vector of the same length as the number of parameters, `c(5, 5, 5)` for 3 estimated parameters will yield 125 iterations.
+
+```{r run_nls_multstart_gridstart}
+# run nls_multstart with gridstart approach
+fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                     data = d_1,
+                     iter = c(5, 5, 5, 5),
                      start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
                      start_upper = c(lnc=10, E=2, Eh=5, Th=330),
                      supp_errors = 'Y',
@@ -98,6 +117,8 @@ fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 2
 
 fit
 ```
+
+Reassuringly both methods give identical model fits!
 
 #### 3. Clean up fit
 

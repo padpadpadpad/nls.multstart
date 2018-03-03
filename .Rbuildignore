@@ -4,3 +4,4 @@
 ^README-.*\.png$
 ^\.travis\.yml$
 ^speed_test\.R$
+^cran-comments.md

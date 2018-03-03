@@ -41,7 +41,7 @@ devtools::install_github("padpadpadpad/nls.multstart")
 
 #### 2. Run nls\_multstart()
 
-**nls\_multstart()** can be used to do non-linear regression on a single curve
+**nls\_multstart()** can be used to do non-linear regression on a single curve.
 
 ``` r
 
@@ -71,13 +71,14 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
 # subset dataset
 d_1 <- subset(Chlorella_TRC, curve_id == 1)
 
-# run nls_multstart
+# run nls_multstart with shotgun approach
 fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = d_1,
                      iter = 250,
                      start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
                      start_upper = c(lnc=10, E=2, Eh=5, Th=330),
                      supp_errors = 'Y',
+                     convergence_count = 100,
                      na.action = na.omit,
                      lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
 
@@ -89,9 +90,41 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 21 
+#> Number of iterations to convergence: 15 
 #> Achieved convergence tolerance: 1.49e-08
 ```
+
+This method uses a random-search/shotgun approach to fit multiple curves. Random start parameter values are picked from a uniform distribution between `start_lower()` and `start_upper()` for each parameter. If the best model is not improved upon (in terms of AIC score) for 100 new start parameter combinations, the function will return that model fit. This is controlled by `convergence_count`, if this is set to `FALSE`, **nls\_multstart()** will try and fit all iterations.
+
+Another method of model fitting available in **nls\_multstart()** is a gridstart approach. This method creates a combination of start parameters, equally spaced across each of the starting parameter bounds. This can be specified with a vector of the same length as the number of parameters, `c(5, 5, 5)` for 3 estimated parameters will yield 125 iterations.
+
+``` r
+# run nls_multstart with gridstart approach
+fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                     data = d_1,
+                     iter = c(5, 5, 5, 5),
+                     start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
+                     start_upper = c(lnc=10, E=2, Eh=5, Th=330),
+                     supp_errors = 'Y',
+                     na.action = na.omit,
+                     lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
+#> Warning in nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp
+#> = K, : A gridstart approach cannot be applied with convergence_count.
+#> Convergence count will be set to FALSE
+
+fit
+#> Nonlinear regression model
+#>   model: ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20)
+#>    data: data
+#>      lnc        E       Eh       Th 
+#>  -1.3462   0.9877   4.3326 312.1887 
+#>  residual sum-of-squares: 7.257
+#> 
+#> Number of iterations to convergence: 16 
+#> Achieved convergence tolerance: 1.49e-08
+```
+
+Reassuringly both methods give identical model fits!
 
 #### 3. Clean up fit
 
@@ -118,27 +151,27 @@ CI <- confint2(fit) %>%
 params <- bind_cols(params, CI)
 select(params, -c(statistic, p.value))
 #>   term    estimate std.error     conf.low   conf.high
-#> 1  lnc  -1.3462105 0.4656398  -2.41997789  -0.2724432
+#> 1  lnc  -1.3462105 0.4656398  -2.41997788  -0.2724432
 #> 2    E   0.9877307 0.4521481  -0.05492466   2.0303860
-#> 3   Eh   4.3326453 1.4877827   0.90181228   7.7634783
-#> 4   Th 312.1887460 3.8781636 303.24568460 321.1318074
+#> 3   Eh   4.3326453 1.4877826   0.90181233   7.7634782
+#> 4   Th 312.1887459 3.8781636 303.24568463 321.1318072
 
 # get predictions
 preds <- augment(fit)
 preds
 #>        ln.rate      K X.weights.     .fitted      .resid
 #> 1  -2.06257833 289.15          1 -1.88694035 -0.17563798
-#> 2  -1.32437939 292.15          1 -1.48002017  0.15564078
-#> 3  -0.95416807 295.15          1 -1.08143502  0.12726695
-#> 4  -0.79443675 298.15          1 -0.69121466 -0.10322209
-#> 5  -0.18203642 301.15          1 -0.31058074  0.12854431
-#> 6   0.17424007 304.15          1  0.05336432  0.12087575
-#> 7  -0.04462754 307.15          1  0.36657462 -0.41120215
-#> 8   0.48050690 310.15          1  0.49837148 -0.01786459
-#> 9   0.38794188 313.15          1  0.17973802  0.20820387
-#> 10  0.39365516 316.15          1 -0.64473311  1.03838827
-#> 11 -3.86319577 319.15          1 -1.70300696 -2.16018881
-#> 12 -1.72352435 322.15          1 -2.81272003  1.08919567
+#> 2  -1.32437939 292.15          1 -1.48002016  0.15564077
+#> 3  -0.95416807 295.15          1 -1.08143501  0.12726694
+#> 4  -0.79443675 298.15          1 -0.69121465 -0.10322210
+#> 5  -0.18203642 301.15          1 -0.31058072  0.12854430
+#> 6   0.17424007 304.15          1  0.05336433  0.12087574
+#> 7  -0.04462754 307.15          1  0.36657463 -0.41120217
+#> 8   0.48050690 310.15          1  0.49837149 -0.01786459
+#> 9   0.38794188 313.15          1  0.17973801  0.20820388
+#> 10  0.39365516 316.15          1 -0.64473313  1.03838829
+#> 11 -3.86319577 319.15          1 -1.70300699 -2.16018878
+#> 12 -1.72352435 322.15          1 -2.81272005  1.08919570
 ```
 
 #### 4. Plot fit
@@ -152,7 +185,7 @@ ggplot() +
   geom_line(aes(K, .fitted), preds)
 ```
 
-![](README-plot_one_fit-1.png)
+![](inst/image/README-plot_one_fit-1.png)
 
 #### 5. Fitting over levels of a factor with nls\_multstart
 
@@ -211,7 +244,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 17 
+#> Number of iterations to convergence: 12 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -306,7 +339,7 @@ ggplot() +
   theme(legend.position = c(0.9, 0.15))
 ```
 
-![](README-plot_many_fits-1.png)
+![](inst/image/README-plot_many_fits-1.png)
 
 #### 8. Plotting confidence intervals
 
@@ -326,4 +359,4 @@ ggplot(params, aes(col = flux)) +
   ylab('parameter estimate')
 ```
 
-![](README-confint_plot-1.png)
+![](inst/image/README-confint_plot-1.png)
