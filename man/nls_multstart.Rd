@@ -3,17 +3,12 @@
 \name{nls_multstart}
 \alias{nls_multstart}
 \title{Finds the best fit of non-linear model based on AIC score}
-\usage{
-nls_multstart(formula, data = parent.frame(), iter, start_lower, start_upper,
-  supp_errors = c("Y", "N"), convergence_count = 100, control, modelweights,
-  ...)
-}
 \arguments{
 \item{formula}{a non-linear model formula, with the response on the left of a
-~ operator and an expression involving parameters on the right}
+~ operator and an expression involving parameters on the right.}
 
 \item{data}{(optional) data.frame, list or environment in which to evaluate
-the variables in \code{formula} and \code{modelweights}}
+the variables in \code{formula} and \code{modelweights}.}
 
 \item{iter}{number of combinations of starting parameters which will be tried
 . If a single value is provided, then a shotgun/random-search approach will
@@ -22,7 +17,7 @@ starting parameter bounds. If a vector of the same length as the number of
 parameters is provided, then a gridstart approach will be used to define
 each combination of that number of equally spaced intervals across each of
 the starting parameter bounds respectively. Thus, c(5,5,5) for three fitted
-parameters yields 125 model fits.  Supplying a vector for \code{iter} should
+parameters yields 125 model fits.  Supplying a vector for \code{iter}
 will override \code{convergence_count}.}
 
 \item{start_lower}{lower boundaries for the start parameters. If missing, this
@@ -31,15 +26,14 @@ will default to -1e+10.}
 \item{start_upper}{upper boundaries for the start parameters. If missing, this
 will default to 1e+10.}
 
-\item{supp_errors}{if \code{supp_errors = 'Y'}, then no error messages will be
-shown from the nlsLM function, reducing the number of error messages printed
-while the model attempts to converge using poor starting parameters. Advised
-to only use \code{supp_errors = 'Y'} when you are confident in the bounds of
-your starting parameters.}
+\item{supp_errors}{if \code{supp_errors = 'Y'}, then no error messages from
+\code{\link[minpack.lm]{nlsLM}} will be shown, reducing the number of error messages printed while the model attempts to converge using poor starting parameters.
+We advise to only use \code{supp_errors = 'Y'} when confident in the bounds of
+ your starting parameters.}
 
 \item{convergence_count}{The number of counts that the winning model should be
 undefeated for before it is declared the winner. This argument defaults to
-100. If specified as FALSE, then all of the iterations will be fitted, and
+100. If specified as \code{FALSE}, then all of the iterations will be fitted, and
 the best model selected. Note that \code{convergence_count} can only be used
 with a shotgun/random-search approach, and not with a gridstart approach.
 This argument will be ignored if a gridstart approach is specified by a
@@ -48,15 +42,14 @@ vector input for \code{iter}.}
 \item{control}{specific control can be specified using
 \code{\link[minpack.lm]{nls.lm.control}}.}
 
-\item{modelweights}{Optional model weights for the nls. If \code{data} is specified,
-then this argument should be the name of the numeric weights vector within
+\item{modelweights}{Optional model weights for the nls. If \code{data} is specified, then this argument should be the name of the numeric weights vector within
 the \code{data} object.}
 
 \item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
 necessary.}
 }
 \value{
-returns a nls object of the best estimated model fit
+returns a nls object of the best estimated model fit.
 }
 \description{
 Finds the best estimated model using non-linear least squares regression using
@@ -65,7 +58,7 @@ nlsLM(). The best fit is determined using AIC scores.
 \note{
 Useful additional arguments for \code{\link[minpack.lm]{nlsLM}} include:
  \code{na.action = na.omit}, \code{lower/upper = c()} where these represent
- upper and lower boundaries for parameter estimates
+ upper and lower boundaries for parameter estimates.
 }
 \examples{
 # load in data
