@@ -14,7 +14,7 @@ Granville Matheson: <mathesong@gmail.com>
 
 Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email <d.padfield@exeter.ac.uk> or <mathesong@gmail.com>.
 
-[![Travis-CI Build Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart) [![Downloads from Rstudio mirror](http://cranlogs.r-pkg.org/badges/grand-total/nls.multstart)](http://www.r-pkg.org/pkg/nls.multstart) [![CRAN version](http://www.r-pkg.org/badges/version/nls.multstart)](https://cran.r-project.org/package=nls.multstart)
+[![Travis-CI Build Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart) [![CRAN version](http://www.r-pkg.org/badges/version/nls.multstart)](https://cran.r-project.org/package=nls.multstart) [![Downloads from Rstudio mirror](http://cranlogs.r-pkg.org/badges/grand-total/nls.multstart)](http://www.r-pkg.org/pkg/nls.multstart)
 
 ### Licensing
 
@@ -91,7 +91,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 21 
+#> Number of iterations to convergence: 14 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -245,7 +245,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 12 
+#> Number of iterations to convergence: 14 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
