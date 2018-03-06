@@ -6,7 +6,7 @@ Authors@R: c(
     person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = c("aut", "cre")),
     person("Granville", "Matheson", email = "mathesong@gmail.com", role = "aut"))
 Maintainer: Daniel Padfield <d.padfield@exeter.ac.uk>
-Description: Non-linear least squares regression with the Levenberg-Maquardt algorithm using multiple starting values for increasing the chance that the minimum found is the global minimum.
+Description: Non-linear least squares regression with the Levenberg-Marquardt algorithm using multiple starting values for increasing the chance that the minimum found is the global minimum.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
