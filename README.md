@@ -14,7 +14,7 @@ Granville Matheson: <mathesong@gmail.com>
 
 Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email <d.padfield@exeter.ac.uk> or <mathesong@gmail.com>.
 
-[![Travis-CI Build Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart)
+[![Travis-CI Build Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart) <http://www.r-pkg.org/badges/version/nls.multstart> <http://cranlogs.r-pkg.org/badges/grand-total/nls.multstart>
 
 ### Licensing
 
@@ -32,10 +32,11 @@ This package is designed to work with the **tidyverse**, harnessing the function
 
 #### 1. Installation
 
-R packages in GitHub can be installed using **devtools**.
+**nls.multstart** can be installed from CRAN using **install.packages()** or GitHub can be installed using **devtools**.
 
 ``` r
 # install package
+install.packages('nls.multstart')
 devtools::install_github("padpadpadpad/nls.multstart")
 ```
 
@@ -90,7 +91,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 15 
+#> Number of iterations to convergence: 14 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -244,7 +245,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 12 
+#> Number of iterations to convergence: 17 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
