@@ -4,7 +4,7 @@ This is a resubmission. In this version I have:
 
 - Changed the Description field of the DESCRIPTION file to try and better explain the method of fitting
     - The package does not use a new method of non-linear least square regression. Instead it uses nlsLM which uses the Levenberg-Marquadt algorithm, so we do not think a reference is needed
-    - We did however, expand on the Description field: "Non-linear least squares regression with the Levenberg-Maquardt algorithm using multiple starting values for increasing the chance that the minimum found is the global minimum"
+    - We did however, expand on the Description field: "Non-linear least squares regression with the Levenberg-Maquardt algorithm using multiple starting values for increasing the chance that the minimum found is the global minimum."
 
 ## Test environments
 
