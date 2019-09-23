@@ -196,27 +196,32 @@ These fits can be cleaned up in a similar way to the single fit, but this time _
 ```{r, tidy_many_fits, warning=FALSE}
 # get summary
 info <- fits %>%
-  unnest(fit %>% map(glance))
+  mutate(summary = map(fit, glance)) %>%
+  unnest(summary)
 
 # get params
 params <- fits %>%
-  unnest(fit %>% map(tidy))
+  mutate(., p = map(fit, tidy)) %>%
+  unnest(p)
 
 # get confidence intervals
-CI <- fits %>% 
-  unnest(fit %>% map(~ confint2(.x) %>%
-  data.frame() %>%
-  rename(., conf.low = X2.5.., conf.high = X97.5..))) %>%
+CI <- fits %>%
+  mutate(., cis = map(fit, confint2),
+         cis = map(cis, data.frame)) %>%
+  unnest(cis) %>%
+  rename(., conf.low = X2.5.., conf.high = X97.5..) %>%
   group_by(., curve_id) %>%
   mutate(., term = c('lnc', 'E', 'Eh', 'Th')) %>%
-  ungroup()
+  ungroup() %>%
+  select(., -data, -fit)
 
 # merge parameters and CI estimates
 params <- merge(params, CI, by = intersect(names(params), names(CI)))
 
 # get predictions
 preds <- fits %>%
-  unnest(fit %>% map(augment))
+  mutate(., p = map(fit, augment)) %>%
+  unnest(p)
 ```
 
 Looking at __info__ allows us to see if all the models converged.
@@ -243,7 +248,8 @@ max_min <- group_by(Chlorella_TRC, curve_id) %>%
 
 # create new predictions
 preds2 <- fits %>%
-  unnest(fit %>% map(augment, newdata = new_preds)) %>%
+  mutate(., p = map(fit, augment, newdata = new_preds)) %>%
+  unnest(p) %>%
   merge(., max_min, by = 'curve_id') %>%
   group_by(., curve_id) %>%
   filter(., K > unique(min_K) & K < unique(max_K)) %>%
