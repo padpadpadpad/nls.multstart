@@ -249,7 +249,7 @@ nls_multstart <-
     if (convergence_count == FALSE) {
       strt$iteration <- 1:nrow(strt)
 
-      allfits <- tidyr::nest(strt, -iteration, .key = "startpars")
+      allfits <- tidyr::nest(strt, startpars = -iteration)
 
 
       # create empty fit
