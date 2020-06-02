@@ -1,20 +1,16 @@
 ## Resubmission
 
-This is a resubmission. In this version I have:
+This is a minor resubmission. In this version we have:
 
-- Changed the Description field of the DESCRIPTION file to try and better explain the method of fitting
-    - The package does not use a new method of non-linear least square regression. Instead it uses nlsLM which uses the Levenberg-Marquadt algorithm, so we do not think a reference is needed
-    - We did however, expand on the Description field: "Non-linear least squares regression with the Levenberg-Marquardt algorithm using multiple starting values for increasing the chance that the minimum found is the global minimum."
+- updated the code of nls_multstart() to work with tidyr v1.1.0.
 
 ## Test environments
 
-- local OS X install, R 3.4.3
-- unbuntu 14.04.5 (on travis-ci), R 3.4.2
-- Mac OS X (on tavis-ci), R 3.4.3
-- win-builder (using devtools::build_win())
+- local OS X install, R 4.0.0
+- unbuntu 16.04.6 (on travis-ci), R 3.6.2
+- Mac OS X (on tavis-ci), R 3.6.2
+- win-builder (using devtools::check_win_devel())
 
 ## R CMD check results
 
 - There were no ERRORs or WARNINGs
-- There was 1 NOTE:
-    - This is purely because it is a New Submission

@@ -52,8 +52,8 @@ __nls.multstart__ can be installed from CRAN using __install.packages()__ or Git
 
 ```{r install, message=FALSE, eval = FALSE}
 # install package
-install.packages('nls.multstart')
-devtools::install_github("padpadpadpad/nls.multstart")
+install.packages('nls.multstart') # from CRAN
+devtools::install_github("padpadpadpad/nls.multstart") # from GitHub
 
 ```
 
