@@ -26,7 +26,7 @@ will default to -1e+10.}
 \item{start_upper}{upper boundaries for the start parameters. If missing, this
 will default to 1e+10.}
 
-\item{supp_errors}{if \code{supp_errors = 'Y'}, then no error messages from
+\item{supp_errors}{if \code{supp_errors = 'Y'}, then warning messages will be suppressed and no error messages from
 \code{\link[minpack.lm]{nlsLM}} will be shown, reducing the number of error messages printed while the model attempts to converge using poor starting parameters.
 We advise to only use \code{supp_errors = 'Y'} when confident in the bounds of
  your starting parameters.}

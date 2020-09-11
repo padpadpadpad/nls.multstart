@@ -4,7 +4,8 @@
 \name{Chlorella_TRC}
 \alias{Chlorella_TRC}
 \title{Example metabolic thermal response curves}
-\format{A data frame with 649 rows and 7 variables:
+\format{
+A data frame with 649 rows and 7 variables:
 \describe{
   \item{curve_id}{a unique value for each separate curve}
   \item{growth.temp}{the growth temperature that the culture was maintained at before measurements were taken (degrees centigrade)}
@@ -13,7 +14,8 @@
   \item{temp}{the assay temperature at which the metabolic rate was measured (degrees centigrade)}
   \item{K}{the assay temperature in degrees Kelvin}
   \item{ln.rate}{the metabolic rate measured (micro mol O2 micro gram C-1 hr-1)}
-}}
+}
+}
 \source{
 Daniel Padfield
 }
