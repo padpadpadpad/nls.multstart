@@ -3,6 +3,7 @@
 This is a minor resubmission. In this version we have:
 
 - updated the argument supp_errors so that warning messages are suppressed as well as error messages
+- changed http --> https in README
 
 ## Test environments
 
