@@ -22,7 +22,12 @@ repository. Or please email
 or
 <a href="mailto:mathesong@gmail.com" class="email">mathesong@gmail.com</a>.
 
-[![Travis-CI Build Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart) [![CRAN version](http://www.r-pkg.org/badges/version/nls.multstart)](https://cran.r-project.org/package=nls.multstart) [![Downloads from Rstudio mirror](http://cranlogs.r-pkg.org/badges/grand-total/nls.multstart)](http://www.r-pkg.org/pkg/nls.multstart)
+[![Travis-CI Build
+Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart)
+[![CRAN
+version](https://www.r-pkg.org/badges/version/nls.multstart)](https://cran.r-project.org/package=nls.multstart)
+[![Downloads from Rstudio
+mirror](https://cranlogs.r-pkg.org/badges/grand-total/nls.multstart)](https://www.r-pkg.org/pkg/nls.multstart)
 
 ### Licensing
 
@@ -56,12 +61,13 @@ less tidy-friendly implementation is
 
 #### 1. Installation
 
-**nls.multstart** can be installed from CRAN using **install.packages()** or GitHub can be installed using **devtools**.
+**nls.multstart** can be installed from CRAN using
+**install.packages()** or GitHub can be installed using **devtools**.
 
 ``` r
 # install package
-install.packages('nls.multstart')
-devtools::install_github("padpadpadpad/nls.multstart")
+install.packages('nls.multstart') # from CRAN
+devtools::install_github("padpadpadpad/nls.multstart") # from GitHub
 ```
 
 #### 2. Run nls\_multstart()
@@ -116,7 +122,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 15 
+#> Number of iterations to convergence: 12 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -146,11 +152,6 @@ fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 2
                      supp_errors = 'Y',
                      na.action = na.omit,
                      lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
-#> Warning in nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp
-#> = K, : A gridstart approach cannot be applied with convergence_count.
-#> Convergence count will be set to FALSE
-#> Warning: All elements of `...` must be named.
-#> Did you want `startpars = c(lnc, E, Eh, Th)`?
 
 fit
 #> Nonlinear regression model
@@ -180,10 +181,10 @@ non-linear regression can also be estimated using
 # get info
 info <- glance(fit)
 info
-#> # A tibble: 1 x 8
-#>   sigma isConv       finTol logLik   AIC   BIC deviance df.residual
-#>   <dbl> <lgl>         <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int>
-#> 1 0.952 TRUE   0.0000000149  -14.0  38.0  40.4     7.26           8
+#> # A tibble: 1 x 9
+#>   sigma isConv       finTol logLik   AIC   BIC deviance df.residual  nobs
+#>   <dbl> <lgl>         <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+#> 1 0.952 TRUE   0.0000000149  -14.0  38.0  40.4     7.26           8    12
 
 # get params
 params <- tidy(fit)
@@ -208,20 +209,20 @@ select(params, -c(statistic, p.value))
 preds <- augment(fit)
 preds
 #> # A tibble: 12 x 5
-#>    ln.rate     K X.weights. .fitted  .resid
-#>      <dbl> <dbl>      <dbl>   <dbl>   <dbl>
-#>  1 -2.06    289.          1 -1.89   -0.176 
-#>  2 -1.32    292.          1 -1.48    0.156 
-#>  3 -0.954   295.          1 -1.08    0.127 
-#>  4 -0.794   298.          1 -0.691  -0.103 
-#>  5 -0.182   301.          1 -0.311   0.129 
-#>  6  0.174   304.          1  0.0534  0.121 
-#>  7 -0.0446  307.          1  0.367  -0.411 
-#>  8  0.481   310.          1  0.498  -0.0179
-#>  9  0.388   313.          1  0.180   0.208 
-#> 10  0.394   316.          1 -0.645   1.04  
-#> 11 -3.86    319.          1 -1.70   -2.16  
-#> 12 -1.72    322.          1 -2.81    1.09
+#>    ln.rate     K `(weights)` .fitted  .resid
+#>      <dbl> <dbl>       <dbl>   <dbl>   <dbl>
+#>  1 -2.06    289.           1 -1.89   -0.176 
+#>  2 -1.32    292.           1 -1.48    0.156 
+#>  3 -0.954   295.           1 -1.08    0.127 
+#>  4 -0.794   298.           1 -0.691  -0.103 
+#>  5 -0.182   301.           1 -0.311   0.129 
+#>  6  0.174   304.           1  0.0534  0.121 
+#>  7 -0.0446  307.           1  0.367  -0.411 
+#>  8  0.481   310.           1  0.498  -0.0179
+#>  9  0.388   313.           1  0.180   0.208 
+#> 10  0.394   316.           1 -0.645   1.04  
+#> 11 -3.86    319.           1 -1.70   -2.16  
+#> 12 -1.72    322.           1 -2.81    1.09
 ```
 
 #### 4. Plot fit
@@ -274,18 +275,18 @@ select(fits, curve_id, data, fit)
 #> Adding missing grouping variables: `growth.temp`, `process`, `flux`
 #> # A tibble: 60 x 6
 #> # Groups:   curve_id, growth.temp, process, flux [60]
-#>    growth.temp process     flux        curve_id           data fit   
-#>          <dbl> <chr>       <chr>          <dbl> <list<df[,3]>> <list>
-#>  1          20 acclimation respiration        1       [12 × 3] <nls> 
-#>  2          20 acclimation respiration        2       [12 × 3] <nls> 
-#>  3          23 acclimation respiration        3       [12 × 3] <nls> 
-#>  4          27 acclimation respiration        4        [9 × 3] <nls> 
-#>  5          27 acclimation respiration        5       [12 × 3] <nls> 
-#>  6          30 acclimation respiration        6       [12 × 3] <nls> 
-#>  7          30 acclimation respiration        7       [12 × 3] <nls> 
-#>  8          33 acclimation respiration        8       [10 × 3] <nls> 
-#>  9          33 acclimation respiration        9        [8 × 3] <nls> 
-#> 10          20 acclimation respiration       10       [10 × 3] <nls> 
+#>    growth.temp process     flux        curve_id data              fit   
+#>          <dbl> <chr>       <chr>          <dbl> <list>            <list>
+#>  1          20 acclimation respiration        1 <tibble [12 × 3]> <nls> 
+#>  2          20 acclimation respiration        2 <tibble [12 × 3]> <nls> 
+#>  3          23 acclimation respiration        3 <tibble [12 × 3]> <nls> 
+#>  4          27 acclimation respiration        4 <tibble [9 × 3]>  <nls> 
+#>  5          27 acclimation respiration        5 <tibble [12 × 3]> <nls> 
+#>  6          30 acclimation respiration        6 <tibble [12 × 3]> <nls> 
+#>  7          30 acclimation respiration        7 <tibble [12 × 3]> <nls> 
+#>  8          33 acclimation respiration        8 <tibble [10 × 3]> <nls> 
+#>  9          33 acclimation respiration        9 <tibble [8 × 3]>  <nls> 
+#> 10          20 acclimation respiration       10 <tibble [10 × 3]> <nls> 
 #> # … with 50 more rows
 
 # look at a single fit
@@ -304,7 +305,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 12 
+#> Number of iterations to convergence: 13 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -352,19 +353,19 @@ select(info, curve_id, logLik, AIC, BIC, deviance, df.residual)
 #> Adding missing grouping variables: `growth.temp`, `process`, `flux`
 #> # A tibble: 60 x 9
 #> # Groups:   curve_id, growth.temp, process, flux [60]
-#>    growth.temp process flux  curve_id  logLik   AIC   BIC deviance
-#>          <dbl> <chr>   <chr>    <dbl>   <dbl> <dbl> <dbl>    <dbl>
-#>  1          20 acclim… resp…        1 -14.0   38.0  40.4     7.26 
-#>  2          20 acclim… resp…        2  -1.20  12.4  14.8     0.858
-#>  3          23 acclim… resp…        3  -7.39  24.8  27.2     2.41 
-#>  4          27 acclim… resp…        4  -0.523 11.0  12.0     0.592
-#>  5          27 acclim… resp…        5 -10.8   31.7  34.1     4.29 
-#>  6          30 acclim… resp…        6  -8.52  27.0  29.5     2.91 
-#>  7          30 acclim… resp…        7  -1.29  12.6  15.0     0.871
-#>  8          33 acclim… resp…        8 -13.4   36.7  38.2     8.48 
-#>  9          33 acclim… resp…        9   1.82   6.36  6.76    0.297
-#> 10          20 acclim… resp…       10  -1.27  12.5  14.1     0.755
-#> # … with 50 more rows, and 1 more variable: df.residual <int>
+#>    growth.temp process  flux   curve_id  logLik   AIC   BIC deviance df.residual
+#>          <dbl> <chr>    <chr>     <dbl>   <dbl> <dbl> <dbl>    <dbl>       <int>
+#>  1          20 acclima… respi…        1 -14.0   38.0  40.4     7.26            8
+#>  2          20 acclima… respi…        2  -1.20  12.4  14.8     0.858           8
+#>  3          23 acclima… respi…        3  -7.39  24.8  27.2     2.41            8
+#>  4          27 acclima… respi…        4  -0.523 11.0  12.0     0.592           5
+#>  5          27 acclima… respi…        5 -10.8   31.7  34.1     4.29            8
+#>  6          30 acclima… respi…        6  -8.52  27.0  29.5     2.91            8
+#>  7          30 acclima… respi…        7  -1.29  12.6  15.0     0.871           8
+#>  8          33 acclima… respi…        8 -13.4   36.7  38.2     8.48            6
+#>  9          33 acclima… respi…        9   1.82   6.36  6.76    0.297           4
+#> 10          20 acclima… respi…       10  -1.27  12.5  14.1     0.755           6
+#> # … with 50 more rows
 ```
 
 #### 7. Plotting predictions
@@ -388,6 +389,7 @@ new_preds <- Chlorella_TRC %>%
 max_min <- group_by(Chlorella_TRC, curve_id) %>%
   summarise(., min_K = min(K), max_K = max(K)) %>%
   ungroup()
+#> `summarise()` ungrouping output (override with `.groups` argument)
 
 # create new predictions
 preds2 <- fits %>%
