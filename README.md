@@ -22,12 +22,15 @@ repository. Or please email
 or
 <a href="mailto:mathesong@gmail.com" class="email">mathesong@gmail.com</a>.
 
-[![Travis-CI Build
-Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart)
+<!-- badges: start -->
+
+[![R build
+status](https://github.com/padpadpadpad/nls.multstart/workflows/R-CMD-check/badge.svg)](https://github.com/padpadpadpad/nls.multstart/actions)
 [![CRAN
 version](https://www.r-pkg.org/badges/version/nls.multstart)](https://cran.r-project.org/package=nls.multstart)
 [![Downloads from Rstudio
 mirror](https://cranlogs.r-pkg.org/badges/grand-total/nls.multstart)](https://www.r-pkg.org/pkg/nls.multstart)
+<!-- badges: end -->
 
 ### Licensing
 
@@ -122,7 +125,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 12 
+#> Number of iterations to convergence: 11 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -305,7 +308,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 13 
+#> Number of iterations to convergence: 12 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 

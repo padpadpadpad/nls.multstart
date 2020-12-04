@@ -28,9 +28,11 @@ Granville Matheson: mathesong@gmail.com
 
 Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email d.padfield@exeter.ac.uk or mathesong@gmail.com.
 
-[![Travis-CI Build Status](https://travis-ci.org/padpadpadpad/nls.multstart.svg?branch=master)](https://travis-ci.org/padpadpadpad/nls.multstart)
+<!-- badges: start -->
+[![R build status](https://github.com/padpadpadpad/nls.multstart/workflows/R-CMD-check/badge.svg)](https://github.com/padpadpadpad/nls.multstart/actions)
 [![CRAN version](https://www.r-pkg.org/badges/version/nls.multstart)](https://cran.r-project.org/package=nls.multstart)
 [![Downloads from Rstudio mirror](https://cranlogs.r-pkg.org/badges/grand-total/nls.multstart)](https://www.r-pkg.org/pkg/nls.multstart)
+<!-- badges: end -->
 
 ### Licensing
 
