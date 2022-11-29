@@ -18,9 +18,9 @@ Imports: minpack.lm,
     dplyr,
     tidyr,
     tibble,
-    MuMIn
+    MuMIn,
+    broom
 Suggests: 
     ggplot2,
-    broom,
     nlstools,
     testthat
