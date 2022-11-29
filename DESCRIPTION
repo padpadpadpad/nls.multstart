@@ -4,15 +4,23 @@ Title: Robust Non-Linear Regression using AIC Scores
 Version: 1.2.0
 Authors@R: c(
     person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = c("aut", "cre")),
-	@@ -17,8 +17,8 @@ 
-Imports: 
-    minpack.lm,
+    person("Granville", "Matheson", email = "mathesong@gmail.com", role = "aut"))
+Maintainer: Daniel Padfield <d.padfield@exeter.ac.uk>
+Description: Non-linear least squares regression with the Levenberg-Marquardt algorithm using multiple starting values for increasing the chance that the minimum found is the global minimum.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
+Depends:
+    R (>= 3.2.1)
+Imports: minpack.lm,
     purrr,
     dplyr,
     tidyr,
     tibble,
-    gamlr
+    MuMIn
 Suggests: 
     ggplot2,
     broom,
     nlstools,
+    testthat
