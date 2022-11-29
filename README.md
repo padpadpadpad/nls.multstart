@@ -1,6 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-nls.multstart
+nls.multstart 
 -------------
 
 Robust and reproducible non-linear regression in R
@@ -12,6 +12,8 @@ Daniel Padfield:
 
 Granville Matheson:
 <a href="mailto:mathesong@gmail.com" class="email">mathesong@gmail.com</a>
+
+Mahmoud Eladawi: just canged the AIC scores to AICc to use the package for small sample size.
 
 ### Issues and suggestions
 
