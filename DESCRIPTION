@@ -1,6 +1,6 @@
-Package: nls.multstart
+Package: nls.multstart.AICc
 Type: Package
-Title: Robust Non-Linear Regression using AIC Scores
+Title: Robust Non-Linear Regression using AICc Scores
 Version: 1.2.0
 Authors@R: c(
     person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = c("aut", "cre")),
@@ -17,8 +17,8 @@ Imports: minpack.lm,
     purrr,
     dplyr,
     tidyr,
-    tibble
-Suggests: 
+    tibble,
+    gamlr
     ggplot2,
     broom,
     nlstools,
