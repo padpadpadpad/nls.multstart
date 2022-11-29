@@ -4,7 +4,9 @@ Title: Robust Non-Linear Regression using AIC Scores
 Version: 1.2.0
 Authors@R: c(
     person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = c("aut", "cre")),
-	@@ -17,8 +17,8 @@ Imports: minpack.lm,
+	@@ -17,8 +17,8 @@ 
+Imports: 
+    minpack.lm,
     purrr,
     dplyr,
     tidyr,
