@@ -219,7 +219,7 @@ nls_multstart <-
         start.vals <- as.list(strt[j, ])
 
         # try and fit the model for every set of searching parameters
-
+        
         try(
           fit <- minpack.lm::nlsLM(
             formula,
@@ -234,17 +234,19 @@ nls_multstart <-
 
         # if the AIC score of the next fit model is < the AIC of the stored fit fit, replace the fit
         # the output to ensure the best model is selected
-
+        glnce <- broom::glance(fit)
+        chat <- glnce$deviance/glnce$df.residual
+        
         if (is.null(fit) && is.null(fit_best)) {
           count <- 0
         }
         else {
-          count <- ifelse(stored_AIC <= gamlr::AICc(fit), count + 1, 0)
+          count <- ifelse(stored_AIC <= MuMIn::QAICc(fit, chat = chat), count + 1, 0)
         }
         if (count == convergence_count) break
 
-        if (!is.null(fit) && stored_AIC > gamlr::AICc(fit)) {
-          stored_AIC <- gamlr::AICc(fit)
+        if (!is.null(fit) && stored_AIC > MuMIn::QAICc(fit, chat = chat)) {
+          stored_AIC <- MuMIn::QAICc(fit, chat = chat)
           fit_best <- fit
         }
       }
@@ -279,8 +281,9 @@ nls_multstart <-
           ),
           silent = silent
         )
-
-        AICval <- ifelse(!is.null(fit), gamlr::AICc(fit), Inf)
+        glnce <- broom::glance(fit)
+        chat <- glnce$deviance/glnce$df.residual
+        AICval <- ifelse(!is.null(fit), MuMIn::QAICc(fit, chat = chat), Inf)
 
         return(AICval)
       }
