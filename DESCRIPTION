@@ -1,4 +1,4 @@
-Package: nls.multstart.AICc
+Package: nls.multstart
 Type: Package
 Title: Robust Non-Linear Regression using AICc Scores
 Version: 1.2.0
