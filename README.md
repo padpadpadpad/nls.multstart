@@ -13,8 +13,6 @@ Daniel Padfield:
 Granville Matheson:
 <a href="mailto:mathesong@gmail.com" class="email">mathesong@gmail.com</a>
 
-Mahmoud Eladawi: just canged the AIC scores to AICc to use the package for small sample size.
-
 ### Issues and suggestions
 
 Please report any issues/suggestions for improvement in the [issues
