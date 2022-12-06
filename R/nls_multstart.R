@@ -234,19 +234,17 @@ nls_multstart <-
 
         # if the AIC score of the next fit model is < the AIC of the stored fit fit, replace the fit
         # the output to ensure the best model is selected
-        glnce <- broom::glance(fit)
-        chat <- glnce$deviance/glnce$df.residual
         
         if (is.null(fit) && is.null(fit_best)) {
           count <- 0
         }
         else {
-          count <- ifelse(stored_AIC <= MuMIn::QAICc(fit, chat = chat), count + 1, 0)
+          count <- ifelse(stored_AIC <= MuMIn::AICc(fit), count + 1, 0)
         }
         if (count == convergence_count) break
 
-        if (!is.null(fit) && stored_AIC > MuMIn::QAICc(fit, chat = chat)) {
-          stored_AIC <- MuMIn::QAICc(fit, chat = chat)
+        if (!is.null(fit) && stored_AIC > MuMIn::AICc(fit)) {
+          stored_AIC <- MuMIn::AICc(fit)
           fit_best <- fit
         }
       }
@@ -283,7 +281,7 @@ nls_multstart <-
         )
         glnce <- broom::glance(fit)
         chat <- glnce$deviance/glnce$df.residual
-        AICval <- ifelse(!is.null(fit), MuMIn::QAICc(fit, chat = chat), Inf)
+        AICval <- ifelse(!is.null(fit), MuMIn::AICc(fit), Inf)
 
         return(AICval)
       }
