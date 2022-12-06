@@ -1,7 +1,7 @@
 Package: nls.multstart
 Type: Package
 Title: Robust Non-Linear Regression using AIC Scores
-Version: 1.2.0
+Version: 1.2.1
 Authors@R: c(
     person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = c("aut", "cre")),
     person("Granville", "Matheson", email = "mathesong@gmail.com", role = "aut"))
