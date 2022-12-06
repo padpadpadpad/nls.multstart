@@ -239,12 +239,12 @@ nls_multstart <-
           count <- 0
         }
         else {
-          count <- ifelse(stored_AIC <= stats::AIC(fit), count + 1, 0)
+          count <- ifelse(stored_AIC <= MuMIn::AICc(fit), count + 1, 0)
         }
         if (count == convergence_count) break
 
-        if (!is.null(fit) && stored_AIC > stats::AIC(fit)) {
-          stored_AIC <- stats::AIC(fit)
+        if (!is.null(fit) && stored_AIC > MuMIn::AICc(fit)) {
+          stored_AIC <- MuMIn::AICc(fit)
           fit_best <- fit
         }
       }
@@ -280,7 +280,7 @@ nls_multstart <-
           silent = silent
         )
 
-        AICval <- ifelse(!is.null(fit), stats::AIC(fit), Inf)
+        AICval <- ifelse(!is.null(fit), MuMIn::AICc(fit), Inf)
 
         return(AICval)
       }
