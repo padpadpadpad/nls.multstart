@@ -279,8 +279,7 @@ nls_multstart <-
           ),
           silent = silent
         )
-        glnce <- broom::glance(fit)
-        chat <- glnce$deviance/glnce$df.residual
+        
         AICval <- ifelse(!is.null(fit), MuMIn::AICc(fit), Inf)
 
         return(AICval)
