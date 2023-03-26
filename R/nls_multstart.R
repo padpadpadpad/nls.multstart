@@ -20,7 +20,7 @@
 #'  will default to -1e+10.
 #' @param start_upper upper boundaries for the start parameters. If missing, this
 #'  will default to 1e+10.
-#' @param supp_errors if \code{supp_errors = 'Y'}, then warning messages will be suppressed and no error messages from
+#' @param supp_errors if \code{supp_errors = 'Y'}, then no error messages from
 #' \code{\link[minpack.lm]{nlsLM}} will be shown, reducing the number of error messages printed while the model attempts to converge using poor starting parameters.
 #' We advise to only use \code{supp_errors = 'Y'} when confident in the bounds of
 #'  your starting parameters.
@@ -118,7 +118,15 @@ nls_multstart <-
     if (missing(start_upper)) start_upper <- rep(10 ^ 10, length(params_est))
 
     if (length(start_lower) != length(params_est) || length(start_upper) != length(params_est)) {
-      stop("There must be as many parameter starting bounds as there are parameters")
+      stop(paste0(
+        "There must be as many parameter starting bounds as there are parameters.\n\n",
+        "Parameters to estimate:              ", paste(params_est, collapse=" "),"\n",
+        "Parameters supplied as input data:   ", paste(params_ind, collapse=" "),"\n",
+        "Number of parameters in start_lower: ", length(start_lower),"\n",
+        "Number of parameters in start_upper: ", length(start_upper),"\n\n",
+        "If there are parameters listed as input data which should be estimated,\n",
+        "this can be caused by variables in the environment/data with the same\n",
+        "name as model parameters."))
     }
 
     params_bds <- data.frame(
@@ -136,12 +144,6 @@ nls_multstart <-
 
     # transform input arguments
     silent <- ifelse(supp_errors == "Y", TRUE, FALSE)
-
-    # if silent is TRUE, temporarily switch off warnings
-    if(silent == TRUE){
-      oo <- options(warn=-1)
-      on.exit(options(oo))
-    }
 
     if ("modelweights" %in% all.vars(formula)) {
       stop(paste0(
@@ -219,7 +221,6 @@ nls_multstart <-
         start.vals <- as.list(strt[j, ])
 
         # try and fit the model for every set of searching parameters
-
         try(
           fit <- minpack.lm::nlsLM(
             formula,
