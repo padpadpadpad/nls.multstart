@@ -10,7 +10,7 @@ Description: Non-linear least squares regression with the Levenberg-Marquardt al
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Depends:
     R (>= 3.2.1)
 Imports: minpack.lm,
