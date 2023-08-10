@@ -1,31 +1,25 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-nls.multstart
--------------
+## nls.multstart
 
 Robust and reproducible non-linear regression in R
 
 ### Authors and maintainers
 
-Daniel Padfield:
-<a href="mailto:d.padfield@exeter.ac.uk" class="email">d.padfield@exeter.ac.uk</a>
+Daniel Padfield: <d.padfield@exeter.ac.uk>
 
-Granville Matheson:
-<a href="mailto:mathesong@gmail.com" class="email">mathesong@gmail.com</a>
+Granville Matheson: <mathesong@gmail.com>
 
 ### Issues and suggestions
 
 Please report any issues/suggestions for improvement in the [issues
 link](https://github.com/padpadpadpad/nls.multstart/issues) for the
-repository. Or please email
-<a href="mailto:d.padfield@exeter.ac.uk" class="email">d.padfield@exeter.ac.uk</a>
-or
-<a href="mailto:mathesong@gmail.com" class="email">mathesong@gmail.com</a>.
+repository. Or please email <d.padfield@exeter.ac.uk> or
+<mathesong@gmail.com>.
 
 <!-- badges: start -->
 
-[![R build
-status](https://github.com/padpadpadpad/nls.multstart/workflows/R-CMD-check/badge.svg)](https://github.com/padpadpadpad/nls.multstart/actions)
+[![R-CMD-check](https://github.com/padpadpadpad/nls.multstart/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/padpadpadpad/nls.multstart/actions/workflows/R-CMD-check.yaml)
 [![CRAN
 version](https://www.r-pkg.org/badges/version/nls.multstart)](https://cran.r-project.org/package=nls.multstart)
 [![Downloads from Rstudio
@@ -46,7 +40,7 @@ same model is fitted over the levels of a factor, which may have the
 same shape of curve, but be much different in terms of parameter
 estimates.
 
-**nls\_multstart()** is the main (currently only) function of
+**nls_multstart()** is the main (currently only) function of
 **nls.multstart**. Similar to the R package **nls2**, it allows multiple
 starting values for each parameter and then iterates through multiple
 starting values, attempting a fit with each set of start parameters. The
@@ -73,9 +67,9 @@ install.packages('nls.multstart') # from CRAN
 devtools::install_github("padpadpadpad/nls.multstart") # from GitHub
 ```
 
-#### 2. Run nls\_multstart()
+#### 2. Run nls_multstart()
 
-**nls\_multstart()** can be used to do non-linear regression on a single
+**nls_multstart()** can be used to do non-linear regression on a single
 curve.
 
 ``` r
@@ -125,7 +119,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 11 
+#> Number of iterations to convergence: 14 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -135,10 +129,10 @@ distribution between `start_lower()` and `start_upper()` for each
 parameter. If the best model is not improved upon (in terms of AIC
 score) for 100 new start parameter combinations, the function will
 return that model fit. This is controlled by `convergence_count`, if
-this is set to `FALSE`, **nls\_multstart()** will try and fit all
+this is set to `FALSE`, **nls_multstart()** will try and fit all
 iterations.
 
-Another method of model fitting available in **nls\_multstart()** is a
+Another method of model fitting available in **nls_multstart()** is a
 gridstart approach. This method creates a combination of start
 parameters, equally spaced across each of the starting parameter bounds.
 This can be specified with a vector of the same length as the number of
@@ -164,7 +158,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 16 
+#> Number of iterations to convergence: 17 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -184,7 +178,7 @@ non-linear regression can also be estimated using
 # get info
 info <- glance(fit)
 info
-#> # A tibble: 1 x 9
+#> # A tibble: 1 × 9
 #>   sigma isConv       finTol logLik   AIC   BIC deviance df.residual  nobs
 #>   <dbl> <lgl>         <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
 #> 1 0.952 TRUE   0.0000000149  -14.0  38.0  40.4     7.26           8    12
@@ -200,7 +194,7 @@ CI <- confint2(fit) %>%
 # bind params and confidence intervals
 params <- bind_cols(params, CI)
 select(params, -c(statistic, p.value))
-#> # A tibble: 4 x 5
+#> # A tibble: 4 × 5
 #>   term  estimate std.error conf.low conf.high
 #>   <chr>    <dbl>     <dbl>    <dbl>     <dbl>
 #> 1 lnc     -1.35      0.466  -2.42      -0.272
@@ -211,7 +205,7 @@ select(params, -c(statistic, p.value))
 # get predictions
 preds <- augment(fit)
 preds
-#> # A tibble: 12 x 5
+#> # A tibble: 12 × 5
 #>    ln.rate     K `(weights)` .fitted  .resid
 #>      <dbl> <dbl>       <dbl>   <dbl>   <dbl>
 #>  1 -2.06    289.           1 -1.89   -0.176 
@@ -239,16 +233,16 @@ ggplot() +
   geom_line(aes(K, .fitted), preds)
 ```
 
-![](inst/image/README-plot_one_fit-1.png)
+![](inst/image/README-plot_one_fit-1.png)<!-- -->
 
-#### 5. Fitting over levels of a factor with nls\_multstart
+#### 5. Fitting over levels of a factor with nls_multstart
 
-**nls\_multstart()** is unlikely to speed you up very much if only one
+**nls_multstart()** is unlikely to speed you up very much if only one
 curve is fitted. However, if you have 10, 60 or 100s of curves to fit,
 it makes sense that at least some of them may not fit with the same
 starting parameters, no matter how many iterations it is run for.
 
-This is where **nls\_multstart()** can help. Multiple models can be
+This is where **nls_multstart()** can help. Multiple models can be
 fitted using **purrr**, **dplyr** and **tidyr**. These fits can then be
 tidied using **broom**, an approach Hadley Wickham has previously
 [written about](https://blog.rstudio.com/2016/02/02/tidyr-0-4-0/).
@@ -275,22 +269,22 @@ the non-linear fits for each combination of our grouping variables.
 ``` r
 # look at output object
 select(fits, curve_id, data, fit)
-#> Adding missing grouping variables: `growth.temp`, `process`, `flux`
-#> # A tibble: 60 x 6
-#> # Groups:   curve_id, growth.temp, process, flux [60]
-#>    growth.temp process     flux        curve_id data              fit   
-#>          <dbl> <chr>       <chr>          <dbl> <list>            <list>
-#>  1          20 acclimation respiration        1 <tibble [12 × 3]> <nls> 
-#>  2          20 acclimation respiration        2 <tibble [12 × 3]> <nls> 
-#>  3          23 acclimation respiration        3 <tibble [12 × 3]> <nls> 
-#>  4          27 acclimation respiration        4 <tibble [9 × 3]>  <nls> 
-#>  5          27 acclimation respiration        5 <tibble [12 × 3]> <nls> 
-#>  6          30 acclimation respiration        6 <tibble [12 × 3]> <nls> 
-#>  7          30 acclimation respiration        7 <tibble [12 × 3]> <nls> 
-#>  8          33 acclimation respiration        8 <tibble [10 × 3]> <nls> 
-#>  9          33 acclimation respiration        9 <tibble [8 × 3]>  <nls> 
-#> 10          20 acclimation respiration       10 <tibble [10 × 3]> <nls> 
-#> # … with 50 more rows
+#> Adding missing grouping variables: `flux`, `growth.temp`, `process`
+#> # A tibble: 60 × 6
+#> # Groups:   flux, growth.temp, process, curve_id [60]
+#>    flux        growth.temp process     curve_id data              fit   
+#>    <chr>             <dbl> <chr>          <dbl> <list>            <list>
+#>  1 respiration          20 acclimation        1 <tibble [12 × 3]> <nls> 
+#>  2 respiration          20 acclimation        2 <tibble [12 × 3]> <nls> 
+#>  3 respiration          23 acclimation        3 <tibble [12 × 3]> <nls> 
+#>  4 respiration          27 acclimation        4 <tibble [9 × 3]>  <nls> 
+#>  5 respiration          27 acclimation        5 <tibble [12 × 3]> <nls> 
+#>  6 respiration          30 acclimation        6 <tibble [12 × 3]> <nls> 
+#>  7 respiration          30 acclimation        7 <tibble [12 × 3]> <nls> 
+#>  8 respiration          33 acclimation        8 <tibble [10 × 3]> <nls> 
+#>  9 respiration          33 acclimation        9 <tibble [8 × 3]>  <nls> 
+#> 10 respiration          20 acclimation       10 <tibble [10 × 3]> <nls> 
+#> # ℹ 50 more rows
 
 # look at a single fit
 summary(fits$fit[[1]])
@@ -308,7 +302,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 12 
+#> Number of iterations to convergence: 13 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -353,22 +347,22 @@ Looking at **info** allows us to see if all the models converged.
 
 ``` r
 select(info, curve_id, logLik, AIC, BIC, deviance, df.residual)
-#> Adding missing grouping variables: `growth.temp`, `process`, `flux`
-#> # A tibble: 60 x 9
-#> # Groups:   curve_id, growth.temp, process, flux [60]
-#>    growth.temp process  flux   curve_id  logLik   AIC   BIC deviance df.residual
-#>          <dbl> <chr>    <chr>     <dbl>   <dbl> <dbl> <dbl>    <dbl>       <int>
-#>  1          20 acclima… respi…        1 -14.0   38.0  40.4     7.26            8
-#>  2          20 acclima… respi…        2  -1.20  12.4  14.8     0.858           8
-#>  3          23 acclima… respi…        3  -7.39  24.8  27.2     2.41            8
-#>  4          27 acclima… respi…        4  -0.523 11.0  12.0     0.592           5
-#>  5          27 acclima… respi…        5 -10.8   31.7  34.1     4.29            8
-#>  6          30 acclima… respi…        6  -8.52  27.0  29.5     2.91            8
-#>  7          30 acclima… respi…        7  -1.29  12.6  15.0     0.871           8
-#>  8          33 acclima… respi…        8 -13.4   36.7  38.2     8.48            6
-#>  9          33 acclima… respi…        9   1.82   6.36  6.76    0.297           4
-#> 10          20 acclima… respi…       10  -1.27  12.5  14.1     0.755           6
-#> # … with 50 more rows
+#> Adding missing grouping variables: `flux`, `growth.temp`, `process`
+#> # A tibble: 60 × 9
+#> # Groups:   flux, growth.temp, process, curve_id [60]
+#>    flux    growth.temp process curve_id  logLik   AIC   BIC deviance df.residual
+#>    <chr>         <dbl> <chr>      <dbl>   <dbl> <dbl> <dbl>    <dbl>       <int>
+#>  1 respir…          20 acclim…        1 -14.0   38.0  40.4     7.26            8
+#>  2 respir…          20 acclim…        2  -1.20  12.4  14.8     0.858           8
+#>  3 respir…          23 acclim…        3  -7.39  24.8  27.2     2.41            8
+#>  4 respir…          27 acclim…        4  -0.523 11.0  12.0     0.592           5
+#>  5 respir…          27 acclim…        5 -10.8   31.7  34.1     4.29            8
+#>  6 respir…          30 acclim…        6  -8.52  27.0  29.5     2.91            8
+#>  7 respir…          30 acclim…        7  -1.29  12.6  15.0     0.871           8
+#>  8 respir…          33 acclim…        8 -13.4   36.7  38.2     8.48            6
+#>  9 respir…          33 acclim…        9   1.82   6.36  6.76    0.297           4
+#> 10 respir…          20 acclim…       10  -1.27  12.5  14.1     0.755           6
+#> # ℹ 50 more rows
 ```
 
 #### 7. Plotting predictions
@@ -392,7 +386,6 @@ new_preds <- Chlorella_TRC %>%
 max_min <- group_by(Chlorella_TRC, curve_id) %>%
   summarise(., min_K = min(K), max_K = max(K)) %>%
   ungroup()
-#> `summarise()` ungrouping output (override with `.groups` argument)
 
 # create new predictions
 preds2 <- fits %>%
@@ -420,7 +413,7 @@ ggplot() +
   theme(legend.position = c(0.9, 0.15))
 ```
 
-![](inst/image/README-plot_many_fits-1.png)
+![](inst/image/README-plot_many_fits-1.png)<!-- -->
 
 #### 8. Plotting confidence intervals
 
@@ -441,4 +434,4 @@ ggplot(params, aes(col = flux)) +
   ylab('parameter estimate')
 ```
 
-![](inst/image/README-confint_plot-1.png)
+![](inst/image/README-confint_plot-1.png)<!-- -->
