@@ -167,7 +167,7 @@ ggplot() +
 
 __nls_multstart()__ is unlikely to speed you up very much if only one curve is fitted. However, if you have 10, 60 or 100s of curves to fit, it makes sense that at least some of them may not fit with the same starting parameters, no matter how many iterations it is run for. 
 
-This is where __nls_multstart()__ can help. Multiple models can be fitted using __purrr__, __dplyr__ and __tidyr__. These fits can then be tidied using __broom__, an approach Hadley Wickham has previously [written about](https://blog.rstudio.com/2016/02/02/tidyr-0-4-0/).
+This is where __nls_multstart()__ can help. Multiple models can be fitted using __purrr__, __dplyr__ and __tidyr__. These fits can then be tidied using __broom__, an approach Hadley Wickham has previously [written about](https://posit.co/blog/tidyr-0-4-0/).
 
 ```{r multiple_models}
 # fit over each set of groupings

@@ -119,7 +119,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 14 
+#> Number of iterations to convergence: 19 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -245,7 +245,7 @@ starting parameters, no matter how many iterations it is run for.
 This is where **nls_multstart()** can help. Multiple models can be
 fitted using **purrr**, **dplyr** and **tidyr**. These fits can then be
 tidied using **broom**, an approach Hadley Wickham has previously
-[written about](https://blog.rstudio.com/2016/02/02/tidyr-0-4-0/).
+[written about](https://posit.co/blog/tidyr-0-4-0/).
 
 ``` r
 # fit over each set of groupings
@@ -302,7 +302,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 13 
+#> Number of iterations to convergence: 23 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
