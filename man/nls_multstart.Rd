@@ -11,14 +11,14 @@
 the variables in \code{formula} and \code{modelweights}.}
 
 \item{iter}{number of combinations of starting parameters which will be tried
-. If a single value is provided, then a shotgun/random-search approach will
-be used to sample starting parameters from a uniform distribution within
-the starting parameter bounds. If a vector of the same length as the number
-of parameters is provided, then a gridstart approach will be used to define
-each combination of that number of equally spaced intervals across each of
-the starting parameter bounds respectively. Thus, c(5,5,5) for three fitted
-parameters yields 125 model fits.  Supplying a vector for \code{iter} will
-override \code{convergence_count}.}
+. If a single value is provided, then a shotgun/random-search/lhs approach
+will be used to sample starting parameters from a uniform distribution
+within the starting parameter bounds. If a vector of the same length as the
+number of parameters is provided, then a gridstart approach will be used to
+define each combination of that number of equally spaced intervals across
+each of the starting parameter bounds respectively. Thus, c(5,5,5) for
+three fitted parameters yields 125 model fits.  Supplying a vector for
+\code{iter} will override \code{convergence_count}.}
 
 \item{start_lower}{lower boundaries for the start parameters. If missing,
 this will default to -1e+10.}
@@ -47,6 +47,14 @@ is specified by a vector input for \code{iter}.}
 \item{modelweights}{Optional model weights for the nls. If \code{data} is
 specified, then this argument should be the name of the numeric weights
 vector within the \code{data} object.}
+
+\item{lhstype}{Method to use for Latin Hypercube Sampling. Choice of
+\code{"random"} (simple random lhs, fast), \code{"improved"} (lhs with
+optimised euclidean distance between points, medium speed), \code{"maximin"}
+(lhs with maximised minimum distance between points, medium speed), or
+\code{"genetic"} (lhs optimised to the S optimilaity criterion using a
+genetic algorithm, slow). If not set, a purely random (shotgun) approach is
+taken. Only used if \code{iter} is a single number.}
 
 \item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
 necessary.}
@@ -97,4 +105,6 @@ fits <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 
 Daniel Padfield
 
 Granville Matheson
+
+Francis Windram
 }

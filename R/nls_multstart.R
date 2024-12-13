@@ -8,14 +8,14 @@
 #' @param data (optional) data.frame, list or environment in which to evaluate
 #'   the variables in \code{formula} and \code{modelweights}.
 #' @param iter number of combinations of starting parameters which will be tried
-#'   . If a single value is provided, then a shotgun/random-search approach will
-#'   be used to sample starting parameters from a uniform distribution within
-#'   the starting parameter bounds. If a vector of the same length as the number
-#'   of parameters is provided, then a gridstart approach will be used to define
-#'   each combination of that number of equally spaced intervals across each of
-#'   the starting parameter bounds respectively. Thus, c(5,5,5) for three fitted
-#'   parameters yields 125 model fits.  Supplying a vector for \code{iter} will
-#'   override \code{convergence_count}.
+#'   . If a single value is provided, then a shotgun/random-search/lhs approach
+#'   will be used to sample starting parameters from a uniform distribution
+#'   within the starting parameter bounds. If a vector of the same length as the
+#'   number of parameters is provided, then a gridstart approach will be used to
+#'   define each combination of that number of equally spaced intervals across
+#'   each of the starting parameter bounds respectively. Thus, c(5,5,5) for
+#'   three fitted parameters yields 125 model fits.  Supplying a vector for
+#'   \code{iter} will override \code{convergence_count}.
 #' @param start_lower lower boundaries for the start parameters. If missing,
 #'   this will default to -1e+10.
 #' @param start_upper upper boundaries for the start parameters. If missing,
@@ -38,6 +38,13 @@
 #' @param modelweights Optional model weights for the nls. If \code{data} is
 #'   specified, then this argument should be the name of the numeric weights
 #'   vector within the \code{data} object.
+#' @param lhstype Method to use for Latin Hypercube Sampling. Choice of
+#' \code{"random"} (simple random lhs, fast), \code{"improved"} (lhs with
+#' optimised euclidean distance between points, medium speed), \code{"maximin"}
+#' (lhs with maximised minimum distance between points, medium speed), or
+#' \code{"genetic"} (lhs optimised to the S optimilaity criterion using a
+#' genetic algorithm, slow). If not set, a purely random (shotgun) approach is
+#' taken. Only used if \code{iter} is a single number.
 #' @param \dots Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if
 #'   necessary.
 #' @return returns a nls object of the best estimated model fit.
@@ -46,6 +53,7 @@
 #'   represent upper and lower boundaries for parameter estimates.
 #' @author Daniel Padfield
 #' @author Granville Matheson
+#' @author Francis Windram
 #' @seealso \code{\link[minpack.lm]{nlsLM}} for details on additional arguments
 #'   to pass to the nlsLM function.
 #' @examples
@@ -83,7 +91,7 @@ nls_multstart <-
   # arguments needed for nls_multstart ####
   function(formula, data = parent.frame(), iter, start_lower, start_upper,
            supp_errors = c("Y", "N"), convergence_count = 100, control,
-           modelweights, ...) {
+           modelweights, lhstype=NULL, ...) {
 
     # set default values
     if (missing(supp_errors)) {
@@ -190,9 +198,21 @@ nls_multstart <-
     ## SHOTGUN ##
 
     if (multistart_type == "shotgun") {
-      strt <- purrr::map2(params_bds$low.bds, params_bds$high.bds, ~runif(iter, .x, .y))
-      names(strt) <- params_bds$param
-      strt <- dplyr::bind_rows(strt)
+      if (is.null(lhstype)) {
+        strt <- purrr::map2(params_bds$low.bds, params_bds$high.bds, ~runif(iter, .x, .y))
+        names(strt) <- params_bds$param
+        strt <- dplyr::bind_rows(strt)
+      } else {
+        lhs_mapper <- switch(lhstype,
+                             random=lhs::randomLHS,  # ~400us for 500x5
+                             improved=lhs::improvedLHS, # ~135ms
+                             maximin=lhs::maximinLHS,  # ~135ms
+                             genetic=lhs::geneticLHS,  # ~500ms
+                             {print("Not a known lhs approach, defaulting to random");lhs::randomLHS})
+        lhs_map <- lhs_mapper(n=iter, k=nrow(params_bds))
+        rmat <- apply(params_bds[,2:3], 1, function(x) {diff(range(x))})
+        strt <- tibble::as_tibble(t(apply(lhs_map, 1, function(x) {(x * rmat) + params_bds$low.bds})))
+      }
     }
 
 
