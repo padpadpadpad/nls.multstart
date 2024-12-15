@@ -91,7 +91,7 @@ nls_multstart <-
   # arguments needed for nls_multstart ####
   function(formula, data = parent.frame(), iter, start_lower, start_upper,
            supp_errors = c("Y", "N"), convergence_count = 100, control,
-           modelweights, lhstype=NULL, ...) {
+           modelweights, lhstype=c("none", "random", "improved", "maximin", "genetic"), ...) {
 
     # set default values
     if (missing(supp_errors)) {
@@ -192,13 +192,14 @@ nls_multstart <-
       convergence_count <- FALSE
     }
 
+    lhstype <- match.arg(lhstype)
 
     # set up start values ####
 
     ## SHOTGUN ##
 
     if (multistart_type == "shotgun") {
-      if (is.null(lhstype)) {
+      if (lhstype == "none") {
         strt <- purrr::map2(params_bds$low.bds, params_bds$high.bds, ~runif(iter, .x, .y))
         names(strt) <- params_bds$param
         strt <- dplyr::bind_rows(strt)
@@ -212,6 +213,7 @@ nls_multstart <-
         lhs_map <- lhs_mapper(n=iter, k=nrow(params_bds))
         rmat <- apply(params_bds[,2:3], 1, function(x) {diff(range(x))})
         strt <- tibble::as_tibble(t(apply(lhs_map, 1, function(x) {(x * rmat) + params_bds$low.bds})))
+        colnames(strt) <- params_bds$param
       }
     }
 
@@ -272,7 +274,9 @@ nls_multstart <-
         else {
           count <- ifelse(stored_AIC <= stats::AIC(fit), count + 1, 0)
         }
-        if (count == convergence_count) break
+        if (count == convergence_count) {
+          break
+        }
 
         if (!is.null(fit) && stored_AIC > stats::AIC(fit)) {
           stored_AIC <- stats::AIC(fit)

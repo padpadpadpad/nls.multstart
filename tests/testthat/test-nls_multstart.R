@@ -29,6 +29,18 @@ test_that("fit with convergence works", {
     c(lnc=-1, E=1, Eh=4, Th=312) )
 })
 
+test_that("fit with LHS works", {
+  expect_equal(
+    round( coef(nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                              data = Chlorella_TRC_test,
+                              iter = 500,
+                              start_lower = c(-10, 0.1, 0.5, 285),
+                              start_upper = c(10, 2, 5, 330),
+                              lower = c(lnc=-10, E=0, Eh=0, Th=0),
+                              supp_errors = 'Y', lhstype = "random") )),
+    c(lnc=-1, E=1, Eh=4, Th=312) )
+})
+
 test_that("fit without convergence works", {
   expect_equal(
     round( coef(nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
