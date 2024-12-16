@@ -48,7 +48,7 @@ is specified by a vector input for \code{iter}.}
 specified, then this argument should be the name of the numeric weights
 vector within the \code{data} object.}
 
-\item{lhstype}{Method to use for Latin Hypercube Sampling. Choice of
+\item{lhstype}{Method to use for Latin Hypercube Sampling using \code{\link[lhs]{lhs}}. Choice of
 \code{"random"} (simple random lhs, fast), \code{"improved"} (lhs with
 optimised euclidean distance between points, medium speed), \code{"maximin"}
 (lhs with maximised minimum distance between points, medium speed), or
@@ -99,7 +99,7 @@ fits <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 
 }
 \seealso{
 \code{\link[minpack.lm]{nlsLM}} for details on additional arguments
-  to pass to the nlsLM function.
+  to pass to the nlsLM function. \code{\link[lhs]{lhs}} for details of Latin Hypercube Sampling
 }
 \author{
 Daniel Padfield

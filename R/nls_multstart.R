@@ -38,7 +38,7 @@
 #' @param modelweights Optional model weights for the nls. If \code{data} is
 #'   specified, then this argument should be the name of the numeric weights
 #'   vector within the \code{data} object.
-#' @param lhstype Method to use for Latin Hypercube Sampling. Choice of
+#' @param lhstype Method to use for Latin Hypercube Sampling using \code{\link[lhs]{lhs}}. Choice of
 #' \code{"random"} (simple random lhs, fast), \code{"improved"} (lhs with
 #' optimised euclidean distance between points, medium speed), \code{"maximin"}
 #' (lhs with maximised minimum distance between points, medium speed), or
@@ -55,7 +55,7 @@
 #' @author Granville Matheson
 #' @author Francis Windram
 #' @seealso \code{\link[minpack.lm]{nlsLM}} for details on additional arguments
-#'   to pass to the nlsLM function.
+#'   to pass to the nlsLM function. \code{\link[lhs]{lhs}} for details of Latin Hypercube Sampling
 #' @examples
 #' # load in data
 #'
