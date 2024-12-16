@@ -107,21 +107,20 @@ nls_multstart <-
       params_est <- all.vars(formula[[3]])[!all.vars(formula[[3]]) %in% names(data)]
       params_dep <- all.vars(formula[[2]])
     } else {
-      stop("data should be a data.frame, list or an environment")
+      cli::cli_abort(c("data should be a {.cls data.frame}, {.cls list} or an {.cls environment}",
+      "x"="You've provided: {.cls {class(data)}}"))
     }
 
     # set up parameter boundaries ####
 
     if (missing(start_lower) || missing(start_upper)) {
-      cat(
-        "No boundaries specified for the starting values of sought parameters. \n",
-        "Default values of +/- 1e+10 will be used. This is likely \n",
-        "to slow the process of finding the best model. \n"
-      )
-      r <- readline("Continue with default values [y/n]? ")
+      cli::cli_warn(c("!"="No boundaries specified for the starting values of sought parameters.",
+                      " "="Default values of +/- {.val {1e+10}} will be used. This is likely to slow the process of finding the best model.",
+                      " "="Continue with default values [Y/n]?"))
+      r <- readline("? ")
 
       if (tolower(r) == "n") {
-        stop("Please enter upper and lower parameter boundaries as start_lower and start_upper in function argument.")
+        cli::cli_abort("Please enter upper and lower parameter boundaries as start_lower and start_upper in the function arguments.")
       }
     }
 
@@ -129,15 +128,18 @@ nls_multstart <-
     if (missing(start_upper)) start_upper <- rep(10 ^ 10, length(params_est))
 
     if (length(start_lower) != length(params_est) || length(start_upper) != length(params_est)) {
-      stop(paste0(
-        "There must be as many parameter starting bounds as there are parameters.\n\n",
-        "Parameters to estimate:              ", paste(params_est, collapse=" "),"\n",
-        "Parameters supplied as input data:   ", paste(params_ind, collapse=" "),"\n",
-        "Number of parameters in start_lower: ", length(start_lower),"\n",
-        "Number of parameters in start_upper: ", length(start_upper),"\n\n",
-        "If there are parameters listed as input data which should be estimated,\n",
-        "this can be caused by variables in the environment/data with the same\n",
-        "name as model parameters."))
+      cli::cli_abort(c(
+        "x"="There must be as many parameter starting bounds as there are parameters.",
+        "",
+        "*"="Parameters to estimate: {.val {params_est}}",
+        "*"="Parameters supplied as input data: {.val {params_ind}}",
+        "*"="Number of parameters in start_lower: {.val {length(start_lower)}}",
+        "*"="Number of parameters in start_upper: {.val {length(start_upper)}}",
+        "",
+        "!"="If there are parameters listed as input data which should be estimated,",
+        " "="this can be caused by variables in the environment/data with the same name as model parameters.",
+        ""
+      ))
     }
 
     params_bds <- data.frame(
@@ -163,10 +165,7 @@ nls_multstart <-
     }
 
     if ("modelweights" %in% all.vars(formula)) {
-      stop(paste0(
-        "The variable name 'modelweights' is reserved for model weights. Please change the name\n",
-        "of this variable"
-      ))
+      cli::cli_abort(c("x"="The variable name {.var modelweights} is reserved for model weights.","!"="Please change the name of this variable."))
     }
 
     if (missing(modelweights)) {
@@ -181,18 +180,16 @@ nls_multstart <-
     } else if (length(iter) == nrow(params_bds)) {
       multistart_type <- "gridstart"
     } else {
-      stop(paste0(
-        "iter should be of length 1 for shotgun approach and of the same length as the\n",
-        "number of parameters for the gridstart approach."
-      ))
+      cli::cli_abort(c("x"="{.arg iter} should be a single number for the shotgun or lhs approaches and of the same length as the number of parameters for the gridstart approach.",
+                       "*"="Number of parameters: {.val {nrow(params_bds)}}"))
     }
 
     if (multistart_type == "gridstart" && convergence_count != FALSE) {
-      warning("A gridstart approach cannot be applied with convergence_count. Convergence count will be set to FALSE")
+      cli::cli_warn(c("!"="A gridstart approach cannot be applied with {.arg convergence_count}.","i"="Convergence count will be set to {.val {FALSE}}"))
       convergence_count <- FALSE
     }
 
-    lhstype <- match.arg(lhstype)
+    lhstype <- rlang::arg_match(lhstype)
 
     # set up start values ####
 
@@ -209,7 +206,7 @@ nls_multstart <-
                              improved=lhs::improvedLHS, # ~135ms
                              maximin=lhs::maximinLHS,  # ~135ms
                              genetic=lhs::geneticLHS,  # ~500ms
-                             {print("Not a known lhs approach, defaulting to random");lhs::randomLHS})
+                             {cli::cli_warn(c("!"="Not a known lhs approach, defaulting to {.val {'random'}}"));lhs::randomLHS})
         lhs_map <- lhs_mapper(n=iter, k=nrow(params_bds))
         rmat <- apply(params_bds[,2:3], 1, function(x) {diff(range(x))})
         strt <- tibble::as_tibble(t(apply(lhs_map, 1, function(x) {(x * rmat) + params_bds$low.bds})))
