@@ -19,7 +19,9 @@ Imports:
     dplyr,
     tidyr,
     tibble,
-    lhs
+    lhs,
+    cli,
+    rlang
 Suggests: 
     ggplot2,
     broom,
