@@ -10,6 +10,8 @@ Daniel Padfield: <d.padfield@exeter.ac.uk>
 
 Granville Matheson: <mathesong@gmail.com>
 
+Francis Windram: <francis.windram17@imperial.ac.uk>
+
 ### Issues and suggestions
 
 Please report any issues/suggestions for improvement in the [issues
@@ -36,8 +38,8 @@ This package is licensed under GPL-3.
 reproducible non-linear regression compared to **nls()** or **nlsLM()**.
 These functions allow only a single starting value, meaning that it can
 be hard to get the best estimated model. This is especially true if the
-same model is fitted over the levels of a factor, which may have the
-same shape of curve, but be much different in terms of parameter
+same model is fitted over many levels of a factor, which may have the
+same shape of curve, but be very different in terms of parameter
 estimates.
 
 **nls_multstart()** is the main (currently only) function of
@@ -50,21 +52,19 @@ regression in R.
 
 This package is designed to work with the **tidyverse**, harnessing the
 functions within **broom**, **tidyr**, **dplyr** and **purrr** to
-extract estimates and plot things easily with **ggplot2**. A slightly
-less tidy-friendly implementation is
-[**nlsLoop**](https://github.com/padpadpadpad/nlsLoop).
+extract estimates and plot things easily with **ggplot2**.
 
 ### Installation and examples
 
 #### 1. Installation
 
 **nls.multstart** can be installed from CRAN using
-**install.packages()** or GitHub can be installed using **devtools**.
+**install.packages()** or from GitHub using **remotes**.
 
 ``` r
 # install package
 install.packages('nls.multstart') # from CRAN
-devtools::install_github("padpadpadpad/nls.multstart") # from GitHub
+remotes::install_github("padpadpadpad/nls.multstart") # from GitHub
 ```
 
 #### 2. Run nls_multstart()
@@ -74,7 +74,7 @@ curve.
 
 ``` r
 
-# load in nlsLoop and other packages
+# load in nls.multstart and other packages
 library(nls.multstart)
 library(ggplot2)
 library(broom)
@@ -119,11 +119,11 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 19 
+#> Number of iterations to convergence: 12 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
-This method uses a random-search/shotgun approach to fit multiple
+This method uses a **random-search/shotgun approach** to fit multiple
 curves. Random start parameter values are picked from a uniform
 distribution between `start_lower()` and `start_upper()` for each
 parameter. If the best model is not improved upon (in terms of AIC
@@ -131,6 +131,47 @@ score) for 100 new start parameter combinations, the function will
 return that model fit. This is controlled by `convergence_count`, if
 this is set to `FALSE`, **nls_multstart()** will try and fit all
 iterations.
+
+An alternative to the shotgun approach is to use **Latin Hypercube
+Sampling** (LHS), which can only be used when `iter` is set to a single
+number. Instead of sampling from a uniform distribution across the
+bounds of each parameter, these methods try to take a set of samples
+from the range of parameter values that covers the parameter space
+optimally for any given set of parameters. *This approach can result in
+less iterations being needed to get the same reliability of model
+fitting than either the shotgun or grid-start approaches*. You can
+specify different methods used for the LHS using `lhstype`. Options are
+“random”, “improved”, maximin”, or “genetic”. You can learn more about
+the options on the [lhs package
+website](https://bertcarnell.github.io/lhs/index.html).
+
+``` r
+# subset dataset
+d_1 <- subset(Chlorella_TRC, curve_id == 1)
+
+# run nls_multstart with shotgun approach
+fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                     data = d_1,
+                     iter = 250,
+                     start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
+                     start_upper = c(lnc=10, E=2, Eh=5, Th=330),
+                     supp_errors = 'Y',
+                     convergence_count = 100,
+                     na.action = na.omit,
+                     lower = c(lnc = -10, E = 0, Eh = 0, Th = 0),
+                     lhstype = 'improved')
+
+fit
+#> Nonlinear regression model
+#>   model: ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20)
+#>    data: data
+#>      lnc        E       Eh       Th 
+#>  -1.3462   0.9877   4.3326 312.1887 
+#>  residual sum-of-squares: 7.257
+#> 
+#> Number of iterations to convergence: 15 
+#> Achieved convergence tolerance: 1.49e-08
+```
 
 Another method of model fitting available in **nls_multstart()** is a
 gridstart approach. This method creates a combination of start
@@ -162,7 +203,7 @@ fit
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
-Reassuringly both methods give identical model fits!
+Reassuringly all methods give identical model fits!
 
 #### 3. Clean up fit
 
@@ -302,7 +343,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 23 
+#> Number of iterations to convergence: 17 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -411,6 +452,12 @@ ggplot() +
   ylab('log Metabolic rate') +
   xlab('Assay temperature (ºC)') +
   theme(legend.position = c(0.9, 0.15))
+#> Warning: A numeric `legend.position` argument in `theme()` was deprecated in ggplot2
+#> 3.5.0.
+#> ℹ Please use the `legend.position.inside` argument of `theme()` instead.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
 ```
 
 ![](inst/image/README-plot_many_fits-1.png)<!-- -->

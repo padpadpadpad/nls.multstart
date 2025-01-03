@@ -24,6 +24,8 @@ Daniel Padfield: d.padfield@exeter.ac.uk
 
 Granville Matheson: mathesong@gmail.com
 
+Francis Windram: francis.windram17@imperial.ac.uk
+
 ### Issues and suggestions
 
 Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nls.multstart/issues) for the repository. Or please email d.padfield@exeter.ac.uk or mathesong@gmail.com.
@@ -40,22 +42,22 @@ This package is licensed under GPL-3.
 
 ### Overview
 
-__nls.multstart__ is an R package that allows more robust and reproducible non-linear regression compared to __nls()__ or __nlsLM()__. These functions allow only a single starting value, meaning that it can be hard to get the best estimated model. This is especially true if the same model is fitted over the levels of a factor, which may have the same shape of curve, but be much different in terms of parameter estimates.
+__nls.multstart__ is an R package that allows more robust and reproducible non-linear regression compared to __nls()__ or __nlsLM()__. These functions allow only a single starting value, meaning that it can be hard to get the best estimated model. This is especially true if the same model is fitted over many levels of a factor, which may have the same shape of curve, but be very different in terms of parameter estimates.
 
-__nls_multstart()__ is the main (currently only) function of __nls.multstart__. Similar to the R package __nls2__, it allows multiple starting values for each parameter and then iterates through multiple starting values, attempting a  fit with each set of start parameters. The best model is then picked on AIC score. This results in a more reproducible and reliable method of fitting non-linear least squares regression in R.
+__nls_multstart()__ is the main (currently only) function of __nls.multstart__. Similar to the R package __nls2__, it allows multiple starting values for each parameter and then iterates through multiple starting values, attempting a fit with each set of start parameters. The best model is then picked on AIC score. This results in a more reproducible and reliable method of fitting non-linear least squares regression in R.
 
-This package is designed to work with the __tidyverse__, harnessing the functions within __broom__, __tidyr__, __dplyr__ and __purrr__ to extract estimates and plot things easily with __ggplot2__. A slightly less tidy-friendly implementation is [__nlsLoop__](https://github.com/padpadpadpad/nlsLoop).
+This package is designed to work with the __tidyverse__, harnessing the functions within __broom__, __tidyr__, __dplyr__ and __purrr__ to extract estimates and plot things easily with __ggplot2__.
 
 ### Installation and examples
 
 #### 1. Installation
 
-__nls.multstart__ can be installed from CRAN using __install.packages()__ or GitHub can be installed using __devtools__. 
+__nls.multstart__ can be installed from CRAN using __install.packages()__ or from GitHub using __remotes__. 
 
 ```{r install, message=FALSE, eval = FALSE}
 # install package
 install.packages('nls.multstart') # from CRAN
-devtools::install_github("padpadpadpad/nls.multstart") # from GitHub
+remotes::install_github("padpadpadpad/nls.multstart") # from GitHub
 
 ```
 
@@ -65,7 +67,7 @@ __nls_multstart()__ can be used to do non-linear regression on a single curve.
 
 ```{r run_nlsLoop_prep, message=FALSE, warning=FALSE, results='hide'}
 
-# load in nlsLoop and other packages
+# load in nls.multstart and other packages
 library(nls.multstart)
 library(ggplot2)
 library(broom)
@@ -105,7 +107,28 @@ fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 2
 fit
 ```
 
-This method uses a random-search/shotgun approach to fit multiple curves. Random start parameter values are picked from a uniform distribution between `start_lower()` and `start_upper()` for each parameter. If the best model is not improved upon (in terms of AIC score) for 100 new start parameter combinations, the function will return that model fit. This is controlled by `convergence_count`, if this is set to `FALSE`, __nls_multstart()__ will try and fit all iterations.
+This method uses a **random-search/shotgun approach** to fit multiple curves. Random start parameter values are picked from a uniform distribution between `start_lower()` and `start_upper()` for each parameter. If the best model is not improved upon (in terms of AIC score) for 100 new start parameter combinations, the function will return that model fit. This is controlled by `convergence_count`, if this is set to `FALSE`, __nls_multstart()__ will try and fit all iterations.
+
+An alternative to the shotgun approach is to use **Latin Hypercube Sampling** (LHS), which can only be used when `iter` is set to a single number. Instead of sampling from a uniform distribution across the bounds of each parameter, these methods try to take a set of samples from the range of parameter values that covers the parameter space optimally for any given set of parameters. *This approach can result in less iterations being needed to get the same reliability of model fitting than either the shotgun or grid-start approaches*. You can specify different methods used for the LHS using `lhstype`. Options are "random", "improved", maximin", or "genetic". You can learn more about the options on the [lhs package website](https://bertcarnell.github.io/lhs/index.html).
+
+```{r run_nls_mulstart_lhs}
+# subset dataset
+d_1 <- subset(Chlorella_TRC, curve_id == 1)
+
+# run nls_multstart with shotgun approach
+fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                     data = d_1,
+                     iter = 250,
+                     start_lower = c(lnc=-10, E=0.1, Eh=0.5, Th=285),
+                     start_upper = c(lnc=10, E=2, Eh=5, Th=330),
+                     supp_errors = 'Y',
+                     convergence_count = 100,
+                     na.action = na.omit,
+                     lower = c(lnc = -10, E = 0, Eh = 0, Th = 0),
+                     lhstype = 'improved')
+
+fit
+```
 
 Another method of model fitting available in __nls_multstart()__ is a gridstart approach. This method creates a combination of start parameters, equally spaced across each of the starting parameter bounds. This can be specified with a vector of the same length as the number of parameters, `c(5, 5, 5)` for 3 estimated parameters will yield 125 iterations.
 
@@ -123,7 +146,7 @@ fit <- nls_multstart(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 2
 fit
 ```
 
-Reassuringly both methods give identical model fits!
+Reassuringly all methods give identical model fits!
 
 #### 3. Clean up fit
 

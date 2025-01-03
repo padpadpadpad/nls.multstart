@@ -1,3 +1,10 @@
+# nls.multstart 2.0
+
+- change error messages to use cli and rlang
+- allow support for latin hypercube sampling for generating start values
+- update NEWS.md
+- submitted to CRAN
+
 ## nls.multstart 1.3.0
 
 - improved the error message when the number of parameters is not matching
