@@ -2,13 +2,16 @@
 
 This is a minor resubmission. In this version we have:
 
-- improved the error message when the number of parameters is not matching
+- change error messages to use cli and rlang
+- allow support for latin hypercube sampling for generating start values
+- updated README
+- update NEWS.md
 
 ## Test environments
 
-- local OS X install, R 4.3.1
+- local OS X (Sonoma 14.5) install, R 4.4.1
 - win-builder (using devtools::check_win_devel())
-- GitHub Actions using r-lib ("check-standard")
+- GitHub Actions using R-CMD-check ("check-standard")
 
 ## R CMD check results
 

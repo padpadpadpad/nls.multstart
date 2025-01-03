@@ -119,7 +119,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 12 
+#> Number of iterations to convergence: 14 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -169,7 +169,7 @@ fit
 #>  -1.3462   0.9877   4.3326 312.1887 
 #>  residual sum-of-squares: 7.257
 #> 
-#> Number of iterations to convergence: 15 
+#> Number of iterations to convergence: 11 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 
@@ -343,7 +343,7 @@ summary(fits$fit[[1]])
 #> 
 #> Residual standard error: 0.9524 on 8 degrees of freedom
 #> 
-#> Number of iterations to convergence: 17 
+#> Number of iterations to convergence: 15 
 #> Achieved convergence tolerance: 1.49e-08
 ```
 

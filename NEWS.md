@@ -1,4 +1,4 @@
-# nls.multstart 2.0
+# nls.multstart 2.0.0
 
 - change error messages to use cli and rlang
 - allow support for latin hypercube sampling for generating start values
